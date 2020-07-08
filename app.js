@@ -16,7 +16,7 @@ mongoose.connect(
     process.env.DB_PASS +
     "@menui-database.9quwf.mongodb.net/<dbname>?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true },
-  (err) => {
+  err => {
     if (err) console.log(err);
     else console.log("Connected To Database");
   }
@@ -24,7 +24,7 @@ mongoose.connect(
 
 // GET A PARTICULAR RESTAURANT //
 
-app.get("/restaurant/:restaurantId", function (req, res) {
+app.get("/restaurant/:restaurantId", function(req, res) {
   Restaurant.findById(req.params.restaurantId, (err, data) => {
     if (err) res.send(err);
     else res.send(data);
@@ -33,7 +33,7 @@ app.get("/restaurant/:restaurantId", function (req, res) {
 
 // GET RESTAURANTS IN A SPECIFIED CITY //
 
-app.get("/city/:cityName", function (req, res) {
+app.get("/city/:cityName", function(req, res) {
   Restaurant.find({ city: decodeURI(req.params.cityName) }, (err, data) => {
     if (err) res.send(err);
     else res.send(data);
@@ -49,20 +49,26 @@ app.post("/restaurant", (req, res) => {
     city: req.body.city,
     imgUrl: req.body.imgUrl,
     workingHours: req.body.workingHours,
-    hidden: req.body.hidden,
+    hidden: req.body.hidden
   });
-  restaurant.save().catch((err) => console.log(err));
+  restaurant.save().catch(err => console.log(err));
   res.status(201).json({
     message: "Restaurant Created",
-    addedRestaurant: restaurant,
+    addedRestaurant: restaurant
   });
 });
 
 // ADD NEW DISH //
 
 app.post("/dish", (req, res) => {
-  const restaurantId = req.body.restaurantId;
-  const userData = req.body.userData;
+  const getRestaurantId = async () => {
+    const result = await Restaurant.findById(req.body.restaurantId).exec();
+    return result;
+  };
+
+  const restaurantId = getRestaurantId();
+
+  /*const userData = validators.validateUser(req.body.userId);
   const dish = new Dish({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
@@ -78,11 +84,12 @@ app.post("/dish", (req, res) => {
       eggs: req.body.eggs,
       seaFood: req.body.seaFood,
       peanuts: req.body.peanuts,
-      sesame: req.body.sesame,
+      sesame: req.body.sesame
     },
     vegan: req.body.vegan,
-    vegetarian: req.body.vegetarian,
-  });
+    vegetarian: req.body.vegetarian
+  });*/
+  res.send(restaurantId);
 });
 
 app.listen(port, () => console.log("Menui back-end is listening at: " + port));

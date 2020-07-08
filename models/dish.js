@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const dishSchema = mongoose.Schema({
-  id: mongoose.Types.ObjectId,
+  _id: mongoose.Types.ObjectId,
   name: String,
   category: String,
   price: Number,

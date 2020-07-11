@@ -7,6 +7,7 @@ const dishSchema = mongoose.Schema({
   price: Number,
   notes: String,
   imgUrl: String,
+  hidden: Boolean,
   weight: Number,
   allergens: {
     gluten: Boolean,

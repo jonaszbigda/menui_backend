@@ -6,6 +6,7 @@ const userSchema = mongoose.Schema({
   password: String,
   restaurantId: mongoose.Types.ObjectId,
   subscriptionActive: Boolean,
+  subscriptionDue: Date,
 });
 
 module.exports = mongoose.model("User", userSchema);

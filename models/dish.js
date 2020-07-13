@@ -2,11 +2,25 @@ const mongoose = require("mongoose");
 
 const dishSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
-  name: String,
-  category: String,
-  price: Number,
+  name: {
+    type: String,
+    maxlength: 128,
+    required: true,
+  },
+  category: {
+    type: String,
+    maxlength: 64,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
   notes: String,
-  imgUrl: String,
+  imgUrl: {
+    type: String,
+    required: true,
+  },
   hidden: Boolean,
   weight: Number,
   allergens: {

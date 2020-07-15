@@ -4,10 +4,12 @@ const restaurantSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
   name: {
     type: String,
+    maxlength: 128,
     required: true,
   },
   city: {
     type: String,
+    maxlength: 128,
     required: true,
   },
   imgUrl: {

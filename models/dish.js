@@ -16,7 +16,10 @@ const dishSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  notes: String,
+  notes: {
+    type: String,
+    maxlength: 128,
+  },
   imgUrl: {
     type: String,
     required: true,

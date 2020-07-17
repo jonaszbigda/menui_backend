@@ -1,9 +1,9 @@
-const Restaurant = require("./models/restaurant");
-const Dish = require("./models/dish");
-const User = require("./models/users");
-const mongoose = require("mongoose");
+import Restaurant from "../models/restaurant.js";
+import Dish from "../models/dish.js";
+import User from "../models/users.js";
+import mongoose from "mongoose";
 
-function validateRestaurant(id, callback) {
+export function validateRestaurant(id, callback) {
   if (mongoose.Types.ObjectId.isValid(id)) {
     Restaurant.exists({ _id: id }, (err, res) => {
       if (err) {
@@ -15,11 +15,11 @@ function validateRestaurant(id, callback) {
   } else callback(false);
 }
 
-function validateUser(id, callback) {
+export function validateUser(id, callback) {
   callback(true);
 }
 
-function validateDishId(id, callback) {
+export function validateDishId(id, callback) {
   if (mongoose.Types.ObjectId.isValid(id)) {
     Dish.exists({ _id: id }, (err, res) => {
       if (err) {
@@ -30,7 +30,3 @@ function validateDishId(id, callback) {
     });
   } else callback(false);
 }
-
-exports.validateRestaurant = validateRestaurant;
-exports.validateUser = validateUser;
-exports.validateDishId = validateDishId;

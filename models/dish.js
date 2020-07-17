@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const dishSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
@@ -39,4 +39,4 @@ const dishSchema = mongoose.Schema({
   vegetarian: Boolean,
 });
 
-module.exports = mongoose.model("Dish", dishSchema);
+export default mongoose.model("Dish", dishSchema);

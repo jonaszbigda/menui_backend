@@ -5,9 +5,11 @@ import helmet from "helmet";
 import routeDish from "../routes/routeDish.js";
 import routeCity from "../routes/routeCity.js";
 import routeRestaurant from "../routes/routeRestaurant.js";
+import routeUser from "../routes/routeUser.js";
 import routeImg from "../routes/routeImg.js";
+import cookieParser from "cookie-parser";
 
-export default ({ app }) => {
+export default ({ app, secret }) => {
   const limiter = rateLimiter({
     windowMs: 15 * 60 * 1000, //time window
     max: 100, //requests from a single IP for a time window
@@ -18,10 +20,12 @@ export default ({ app }) => {
   app.use(helmet());
   app.use(limiter);
   app.use(cors());
+  app.use(cookieParser(secret));
   app.use("/dish", routeDish);
   app.use("/city", routeCity);
   app.use("/restaurant", routeRestaurant);
   app.use("/img", routeImg);
+  app.use("/user", routeUser);
 
   return app;
 };

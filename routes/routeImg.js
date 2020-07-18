@@ -1,5 +1,8 @@
 import express from "express";
 import multer from "multer";
+import fs from "fs";
+import * as services from "../services/services.js";
+
 var router = express.Router();
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -8,19 +11,20 @@ var storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(
       null,
-      new Date() //Date.now().toString
-        .toISOString()
+      Date.now()
+        .toString()
         .trim()
         .replace(/[:_ -.]/g, "") +
         Math.floor(Math.random() * 5000 + 1) +
-        file.mimetype.replace("/", ".")
+        file.mimetype.replace("/", ".") +
+        "_TEMP"
     );
   },
 });
 const upload = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
-    if (file.mimetype !== "image/jpg") {
+    if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg") {
       return cb(null, false);
     }
     cb(null, true);
@@ -28,8 +32,29 @@ const upload = multer({
   limits: { fileSize: 4000000 },
 }); //max file size = 4Mb
 
-router.post("/", upload.single("menuiImage"), (req, res) => {
-  res.sendStatus(201);
+router.post("/", upload.single("menuiImage"), async (req, res) => {
+  try {
+    const image = req.file;
+    if (!image) {
+      res.sendStatus(204);
+    } else {
+      setTimeout(() => {
+        fs.unlink(image.path, (err) => {
+          if (err) {
+            console.log("No such file or directory");
+          }
+        });
+      }, 1000 * 600);
+      res
+        .status(200)
+        .cookie("img", encodeURI(image.path), {
+          maxAge: 1000 * 600,
+        })
+        .send();
+    }
+  } catch (err) {
+    res.sendStatus(500);
+  }
 });
 
 export default router;

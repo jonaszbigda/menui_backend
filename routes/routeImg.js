@@ -32,29 +32,42 @@ const upload = multer({
   limits: { fileSize: 4000000 },
 }); //max file size = 4Mb
 
+// POST
+
 router.post("/", upload.single("menuiImage"), async (req, res) => {
-  try {
-    const image = req.file;
-    if (!image) {
-      res.sendStatus(204);
-    } else {
-      setTimeout(() => {
-        fs.unlink(image.path, (err) => {
-          if (err) {
-            console.log("No such file or directory");
-          }
-        });
-      }, 1000 * 600);
-      res
-        .status(200)
-        .cookie("img", encodeURI(image.path), {
-          maxAge: 1000 * 600,
-        })
-        .send();
-    }
-  } catch (err) {
-    res.sendStatus(500);
+  const token = req.headers["x-auth-token"];
+  if (!token) {
+    res.sendStatus(401);
+    return;
   }
+  services.validateUserToken(token, (result) => {
+    if (!result) {
+      res.sendStatus(401);
+    } else {
+      try {
+        const image = req.file;
+        if (!image) {
+          res.sendStatus(204);
+        } else {
+          setTimeout(() => {
+            fs.unlink(image.path, (err) => {
+              if (err) {
+                console.log("No such file or directory");
+              }
+            });
+          }, 1000 * 600);
+          res
+            .status(200)
+            .cookie("img", encodeURI(image.path), {
+              maxAge: 1000 * 600,
+            })
+            .send();
+        }
+      } catch (err) {
+        res.sendStatus(500);
+      }
+    }
+  });
 });
 
 export default router;

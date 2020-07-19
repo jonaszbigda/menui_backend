@@ -2,8 +2,6 @@ import express from "express";
 import Restaurant from "../models/restaurant.js";
 import * as services from "../services/services.js";
 import Dish from "../models/dish.js";
-import sanitizer from "string-sanitizer";
-import mongoose from "mongoose";
 
 var router = express.Router();
 
@@ -27,7 +25,12 @@ router.post("/", (req, res) => {
     if (!result) {
       res.sendStatus(400);
     } else {
-      services.validateUser(req.body.userId, (result) => {
+      const token = req.headers["x-auth-token"];
+      if (!token) {
+        res.sendStatus(401);
+        return;
+      }
+      services.validateUserToken(token, (result) => {
         if (!result) {
           res.sendStatus(401);
         } else {
@@ -66,7 +69,12 @@ router.put("/", (req, res) => {
     if (!result) {
       res.sendStatus(204);
     } else {
-      services.validateUser(req.body.userId, (result) => {
+      const token = req.headers["x-auth-token"];
+      if (!token) {
+        res.sendStatus(401);
+        return;
+      }
+      services.validateUserToken(token, (result) => {
         if (!result) {
           res.sendStatus(401);
         } else {

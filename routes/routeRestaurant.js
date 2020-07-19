@@ -26,7 +26,12 @@ router.get("/", (req, res) => {
 // ADD NEW RESTAURANT
 
 router.post("/", (req, res) => {
-  services.validateUser(req.body.userId, (result) => {
+  const token = req.headers["x-auth-token"];
+  if (!token) {
+    res.sendStatus(401);
+    return;
+  }
+  services.validateUserToken(token, (result) => {
     if (!result) {
       res.sendStatus(401);
     } else {

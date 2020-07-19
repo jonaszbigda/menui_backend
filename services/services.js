@@ -1,9 +1,14 @@
 import Restaurant from "../models/restaurant.js";
+import express from "express";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import mongoose from "mongoose";
 import sanitizer from "string-sanitizer";
+import jwt from "jsonwebtoken";
 import fs from "fs";
+import bcrypt from "bcrypt";
+import * as config from "../config/index.js";
+const { jwtSecret } = config;
 
 export function validateRestaurant(id, callback) {
   if (mongoose.Types.ObjectId.isValid(id)) {
@@ -17,8 +22,47 @@ export function validateRestaurant(id, callback) {
   } else callback(false);
 }
 
-export function validateUser(id, callback) {
-  callback(true);
+export function fetchUserHash(email, callback) {
+  User.findOne({ email: email }, (err, res) => {
+    if (err || res === null) {
+      callback(false);
+    } else {
+      callback(res);
+    }
+  });
+}
+
+export function generateAuthToken(user) {
+  const token = jwt.sign(
+    { email: user.email, subcsriptionActive: user.subscriptionActive },
+    jwtSecret,
+    { expiresIn: "1h" }
+  );
+  return token;
+}
+
+export function checkEmailTaken(email, callback) {
+  User.exists({ email: email }, (err, res) => {
+    if (err) {
+      callback(false);
+    } else {
+      callback(res);
+    }
+  });
+}
+
+export function validateUserToken(token, callback) {
+  jwt.verify(token, jwtSecret, { ignoreExpiration: false }, (err, decoded) => {
+    if (err) {
+      callback(false);
+    } else {
+      if (decoded === undefined) {
+        callback(false);
+      } else {
+        callback(decoded);
+      }
+    }
+  });
 }
 
 export function validateDishId(id, callback) {
@@ -116,4 +160,25 @@ export function yearFromNowDate() {
 
   var date = new Date();
   return date.addDays(365);
+}
+
+export function hashPass(pass, callback) {
+  bcrypt.genSalt(10, (err, salt) => {
+    if (err) callback(false);
+    bcrypt.hash(pass, salt, function (err, hash) {
+      if (err) {
+        callback(false);
+      } else {
+        callback(hash);
+      }
+    });
+  });
+}
+
+export function dueDateBasedOnSubscription(subscriptionActive) {
+  if (subscriptionActive === true) {
+    return yearFromNowDate();
+  } else {
+    return new Date();
+  }
 }

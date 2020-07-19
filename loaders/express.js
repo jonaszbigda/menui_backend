@@ -15,11 +15,14 @@ export default ({ app, secret }) => {
     max: 100, //requests from a single IP for a time window
   });
 
-  app.use(bodyParser.json({ limit: "100kb" })); // limit JSON body payload size
-  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(helmet());
   app.use(limiter);
   app.use(cors());
+  app.use(bodyParser.json({ limit: "100kb" })); // limit JSON body payload size
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(function (err, req, res, next) {
+    if (err) res.sendStatus(422);
+  });
   app.use(cookieParser(secret));
   app.use("/dish", routeDish);
   app.use("/city", routeCity);

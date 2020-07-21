@@ -6,6 +6,7 @@ import routeDish from "../routes/routeDish.js";
 import routeCity from "../routes/routeCity.js";
 import routeRestaurant from "../routes/routeRestaurant.js";
 import routeUser from "../routes/routeUser.js";
+import routeSearch from "../routes/routeSearch.js";
 import routeImg from "../routes/routeImg.js";
 import cookieParser from "cookie-parser";
 
@@ -15,9 +16,9 @@ export default ({ app, secret }) => {
     max: 100, //requests from a single IP for a time window
   });
 
+  app.use(cors());
   app.use(helmet());
   app.use(limiter);
-  app.use(cors());
   app.use(bodyParser.json({ limit: "100kb" })); // limit JSON body payload size
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(function (err, req, res, next) {
@@ -29,6 +30,7 @@ export default ({ app, secret }) => {
   app.use("/restaurant", routeRestaurant);
   app.use("/img", routeImg);
   app.use("/user", routeUser);
+  app.use("/search", routeSearch);
 
   return app;
 };

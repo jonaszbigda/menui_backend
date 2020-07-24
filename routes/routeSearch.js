@@ -20,7 +20,7 @@ router.get("/", (req, res) => {
           { hidden: false },
         ],
       },
-      "_id name city imgUrl workingHours",
+      "_id name city imgUrl workingHours description tags phone hidden",
       (err, results) => {
         if (err) {
           res.sendStatus(500);

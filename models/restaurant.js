@@ -20,6 +20,19 @@ const restaurantSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  description: {
+    type: String,
+  },
+  tags: {
+    cardPayments: Boolean,
+    petFriendly: Boolean,
+    glutenFree: Boolean,
+    vegan: Boolean,
+    vegetarian: Boolean,
+    alcohol: Boolean,
+    delivery: Boolean,
+  },
+  phone: Number,
   hidden: Boolean,
   dishes: [mongoose.Types.ObjectId],
 });

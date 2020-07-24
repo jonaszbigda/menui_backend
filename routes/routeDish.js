@@ -1,6 +1,7 @@
 import express from "express";
 import Restaurant from "../models/restaurant.js";
 import * as services from "../services/services.js";
+import sanitizer from "string-sanitizer";
 import Dish from "../models/dish.js";
 
 var router = express.Router();

@@ -77,15 +77,20 @@ router.get("/dishes", (req, res) => {
           if (err) {
             res.sendStatus(404);
           } else {
-            const dishesCount = result.dishes.length;
+            var dishesCount = result.dishes.length;
             let dishes = [];
             result.dishes.forEach((element) => {
               Dish.findById(element, (err, result) => {
                 if (err) {
-                  console.log("ERROR fetching dish");
+                  res.sendStatus(500);
                 } else {
-                  dishes.push(result);
-                  if (dishes.length == dishesCount) res.send(dishes);
+                  if (result === null) {
+                    dishesCount--;
+                    if (dishes.length == dishesCount) res.send(dishes);
+                  } else {
+                    dishes.push(result);
+                    if (dishes.length == dishesCount) res.send(dishes);
+                  }
                 }
               });
             });

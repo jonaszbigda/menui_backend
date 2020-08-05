@@ -35,6 +35,9 @@ const dishSchema = mongoose.Schema({
     peanuts: Boolean,
     sesame: Boolean,
   },
+  ingredients: {
+    type: Array,
+  },
   vegan: Boolean,
   vegetarian: Boolean,
 });

@@ -48,6 +48,10 @@ router.post("/", (req, res) => {
         city: sanitizer.sanitize.keepUnicode(req.body.city),
         imgUrl: services.saveImage(req.cookies["img"]),
         workingHours: req.body.workingHours,
+        description: sanitizer.sanitize.keepUnicode(req.body.description),
+        tags: req.body.tags,
+        links: req.body.links,
+        phone: req.body.phone,
         hidden: req.body.hidden,
       });
       restaurant.save((err) => {

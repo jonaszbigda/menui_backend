@@ -32,6 +32,12 @@ const restaurantSchema = mongoose.Schema({
     alcohol: Boolean,
     delivery: Boolean,
   },
+  links: {
+    facebook: String,
+    twitter: String,
+    instagram: String,
+    www: String,
+  },
   phone: Number,
   hidden: Boolean,
   dishes: [mongoose.Types.ObjectId],

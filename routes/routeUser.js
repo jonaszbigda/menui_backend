@@ -4,9 +4,17 @@ import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import * as services from "../services/services.js";
 import * as config from "../config/index.js";
+import AgileCRMManager from "agile_crm";
 const { API_KEY, jwtSecret } = config;
 
 var router = express.Router();
+var agileAPI = new AgileCRMManager("bankai", API_KEY, "bankai@bankai.pl");
+var success = function (data) {
+  console.log("Task successfull");
+};
+var error = function (err) {
+  console.log("Task failed successfully");
+};
 
 router.post("/login", (req, res) => {
   if (req.body.password && req.body.email) {
@@ -19,11 +27,15 @@ router.post("/login", (req, res) => {
           err,
           result
         ) {
-          if (result) {
-            var token = services.generateAuthToken(user);
-            res.header("x-auth-token", token).status(202).send();
+          if (err) {
+            res.sendStatus(500);
           } else {
-            res.sendStatus(401);
+            if (result) {
+              var token = services.generateAuthToken(user);
+              res.header("x-auth-token", token).status(202).send();
+            } else {
+              res.sendStatus(401);
+            }
           }
         });
       }
@@ -49,34 +61,32 @@ router.post("/check", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-  if (req.body.key === API_KEY) {
-    services.checkEmailTaken(req.body.email, (result) => {
-      if (result) {
-        res.sendStatus(409);
-      } else {
-        services.hashPass(req.body.password, (hashedPass) => {
-          const user = new User({
-            _id: new mongoose.Types.ObjectId(),
-            email: req.body.email,
-            password: hashedPass,
-            subscriptionActive: req.body.subscriptionActive,
-            subscriptionDue: services.dueDateBasedOnSubscription(
-              req.body.subscriptionActive
-            ),
-          });
-          user.save((err) => {
-            if (err) {
-              res.sendStatus(500);
-            } else {
-              res.sendStatus(201);
-            }
-          });
+  services.checkEmailTaken(req.body.email, (result) => {
+    if (result) {
+      res.sendStatus(409);
+    } else {
+      services.hashPass(req.body.password, (hashedPass) => {
+        const user = new User({
+          _id: new mongoose.Types.ObjectId(),
+          email: req.body.email,
+          password: hashedPass,
+          firstname: req.body.firstname,
+          lastname: req.body.lastname,
+          subscriptionActive: true,
+          subscriptionDue: services.halfYearFromNowDate(),
         });
-      }
-    });
-  } else {
-    res.sendStatus(404);
-  }
+        user.save((err) => {
+          if (err) {
+            res.sendStatus(500);
+          } else {
+            const contact = services.composeNewContact(user);
+            agileAPI.contactAPI.add(contact, success, error);
+            res.sendStatus(201);
+          }
+        });
+      });
+    }
+  });
 });
 
 export default router;

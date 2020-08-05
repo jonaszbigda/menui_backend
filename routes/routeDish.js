@@ -9,7 +9,7 @@ var router = express.Router();
 // GET DISH BY ID
 
 router.get("/", (req, res) => {
-  Dish.findById(req.body.dishId, (err, data) => {
+  Dish.findById(req.query.dishId, (err, data) => {
     if (err) {
       res.sendStatus(404);
     } else

@@ -10,12 +10,23 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
+    type: String,
+    required: true,
+  },
   restaurantId: mongoose.Types.ObjectId,
   subscriptionActive: {
     type: Boolean,
     required: true,
   },
-  subscriptionDue: Date,
+  subscriptionDue: {
+    type: String,
+    required: true,
+  },
 });
 
 export default mongoose.model("User", userSchema);

@@ -50,7 +50,7 @@ router.get("/autocomplete/", (req, res) => {
       "name city",
       (err, doc) => {
         if (err) {
-          res.send(404);
+          res.sendStatus(404);
         } else {
           doc.forEach((value) => {
             cities.add(value.city);

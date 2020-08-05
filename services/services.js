@@ -96,6 +96,7 @@ export function createDish(dish, cookie, generateId) {
         peanuts: dish.allergens.peanuts,
         sesame: dish.allergens.sesame,
       },
+      ingredients: dish.ingredients,
       vegan: dish.vegan,
       vegetarian: dish.vegetarian,
     });
@@ -117,6 +118,7 @@ export function createDish(dish, cookie, generateId) {
         peanuts: dish.allergens.peanuts,
         sesame: dish.allergens.sesame,
       },
+      ingredients: dish.ingredients,
       vegan: dish.vegan,
       vegetarian: dish.vegetarian,
     });
@@ -162,6 +164,18 @@ export function yearFromNowDate() {
   return date.addDays(365);
 }
 
+export function halfYearFromNowDate() {
+  Date.prototype.addDays = function (days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+  };
+
+  var nowDate = new Date();
+  var resultDate = nowDate.addDays(183);
+  return toShortDate(resultDate);
+}
+
 export function hashPass(pass, callback) {
   bcrypt.genSalt(10, (err, salt) => {
     if (err) callback(false);
@@ -177,8 +191,58 @@ export function hashPass(pass, callback) {
 
 export function dueDateBasedOnSubscription(subscriptionActive) {
   if (subscriptionActive === true) {
-    return yearFromNowDate();
+    return halfYearFromNowDate();
   } else {
     return new Date();
   }
+}
+
+export function composeNewContact(request) {
+  const dateNow = new Date();
+  const contact = {
+    lead_score: "100",
+    tags: ["newUser"],
+    properties: [
+      {
+        type: "SYSTEM",
+        name: "first_name",
+        value: request.firstname,
+      },
+      {
+        type: "SYSTEM",
+        name: "last_name",
+        value: request.lastname,
+      },
+      {
+        type: "SYSTEM",
+        name: "email",
+        subtype: "work",
+        value: request.email,
+      },
+      {
+        type: "CUSTOM",
+        name: "UserID",
+        value: request._id,
+      },
+      {
+        type: "CUSTOM",
+        name: "Subscription Started",
+        value: toShortDate(dateNow),
+      },
+      {
+        type: "CUSTOM",
+        name: "Subscription Due",
+        value: request.subscriptionDue,
+      },
+    ],
+  };
+
+  return contact;
+}
+
+function toShortDate(date) {
+  const shortDate =
+    date.getMonth() + "/" + date.getDay() + "/" + date.getFullYear();
+
+  return shortDate;
 }

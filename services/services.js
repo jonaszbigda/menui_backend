@@ -22,7 +22,7 @@ export function validateRestaurant(id, callback) {
   } else callback(false);
 }
 
-export function fetchUserHash(email, callback) {
+export function fetchUser(email, callback) {
   User.findOne({ email: email }, (err, res) => {
     if (err || res === null) {
       callback(false);
@@ -34,7 +34,13 @@ export function fetchUserHash(email, callback) {
 
 export function generateAuthToken(user) {
   const token = jwt.sign(
-    { email: user.email, subcsriptionActive: user.subscriptionActive },
+    {
+      email: user.email,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      id: user._id,
+      restaurants: user.restaurants,
+    },
     jwtSecret,
     { expiresIn: "1h" }
   );
@@ -223,16 +229,6 @@ export function composeNewContact(request) {
         type: "CUSTOM",
         name: "UserID",
         value: request._id,
-      },
-      {
-        type: "CUSTOM",
-        name: "Subscription Started",
-        value: toShortDate(dateNow),
-      },
-      {
-        type: "CUSTOM",
-        name: "Subscription Due",
-        value: request.subscriptionDue,
       },
     ],
   };

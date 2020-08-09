@@ -40,6 +40,9 @@ const restaurantSchema = mongoose.Schema({
   },
   phone: Number,
   hidden: Boolean,
+  subscriptionActive: Boolean,
+  subscriptionStarted: String,
+  subscriptionDue: String,
   dishes: [mongoose.Types.ObjectId],
 });
 

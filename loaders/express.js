@@ -16,7 +16,7 @@ export default ({ app, secret }) => {
     max: 100, //requests from a single IP for a time window
   });
 
-  app.use(cors());
+  app.use(cors({ exposedHeaders: "x-auth-token" }));
   app.use(helmet());
   app.use(limiter);
   app.use(bodyParser.json({ limit: "100kb" })); // limit JSON body payload size

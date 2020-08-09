@@ -18,7 +18,7 @@ var error = function (err) {
 
 router.post("/login", (req, res) => {
   if (req.body.password && req.body.email) {
-    services.fetchUserHash(req.body.email, (result) => {
+    services.fetchUser(req.body.email, (result) => {
       if (!result) {
         res.sendStatus(404);
       } else {
@@ -31,8 +31,14 @@ router.post("/login", (req, res) => {
             res.sendStatus(500);
           } else {
             if (result) {
-              var token = services.generateAuthToken(user);
-              res.header("x-auth-token", token).status(202).send();
+              const userNoPass = {
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                id: user._id,
+              };
+              var token = services.generateAuthToken(userNoPass);
+              res.header("x-auth-token", token).status(202).send(userNoPass);
             } else {
               res.sendStatus(401);
             }
@@ -43,21 +49,6 @@ router.post("/login", (req, res) => {
   } else {
     res.sendStatus(404);
   }
-});
-
-router.post("/check", (req, res) => {
-  const token = req.headers["x-auth-token"];
-  if (!token) {
-    res.sendStatus(401);
-    return;
-  }
-  services.validateUserToken(token, (result) => {
-    if (!result) {
-      res.sendStatus(401);
-    } else {
-      res.send(result);
-    }
-  });
 });
 
 router.post("/register", (req, res) => {
@@ -72,8 +63,6 @@ router.post("/register", (req, res) => {
           password: hashedPass,
           firstname: req.body.firstname,
           lastname: req.body.lastname,
-          subscriptionActive: true,
-          subscriptionDue: services.halfYearFromNowDate(),
         });
         user.save((err) => {
           if (err) {

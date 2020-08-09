@@ -18,15 +18,8 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  restaurantId: mongoose.Types.ObjectId,
-  subscriptionActive: {
-    type: Boolean,
-    required: true,
-  },
-  subscriptionDue: {
-    type: String,
-    required: true,
-  },
+  restaurants: [mongoose.Types.ObjectId],
+  trialUsed: Boolean,
 });
 
 export default mongoose.model("User", userSchema);

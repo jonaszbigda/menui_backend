@@ -1,11 +1,10 @@
 import Restaurant from "../models/restaurant.js";
-import express from "express";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import mongoose from "mongoose";
 import sanitizer from "string-sanitizer";
+import renameBlob from "./renameBlob.js";
 import jwt from "jsonwebtoken";
-import fs from "fs";
 import bcrypt from "bcrypt";
 import * as config from "../config/index.js";
 const { jwtSecret } = config;
@@ -57,18 +56,14 @@ export function checkEmailTaken(email, callback) {
   });
 }
 
-export function validateUserToken(token, callback) {
-  jwt.verify(token, jwtSecret, { ignoreExpiration: false }, (err, decoded) => {
-    if (err) {
-      callback(false);
-    } else {
-      if (decoded === undefined) {
-        callback(false);
-      } else {
-        callback(decoded);
-      }
-    }
-  });
+export function validateUserToken(token) {
+  let verified;
+  try {
+    verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
+  } catch (error) {
+    verified = false;
+  }
+  return verified; // should be return verified for production
 }
 
 export function validateDishId(id, callback) {
@@ -129,33 +124,6 @@ export function createDish(dish, cookie, generateId) {
       vegetarian: dish.vegetarian,
     });
     return newDish;
-  }
-}
-
-function renameImage(imagePath) {
-  var newPath = imagePath.replace("_TEMP", "");
-  fs.rename(imagePath, newPath, (err) => {
-    if (err) console.log(err);
-  });
-  return newPath;
-}
-
-function chooseImg(cookie, originalPath) {
-  var cookiePath = decodeURI(cookie);
-  if (cookiePath != originalPath) {
-    return saveImage(cookie);
-  } else {
-    return originalPath;
-  }
-}
-
-export function saveImage(cookie) {
-  if (cookie == undefined) {
-    return undefined;
-  } else {
-    var decodedCookie = decodeURI(cookie);
-    var newPath = renameImage(decodedCookie);
-    return newPath;
   }
 }
 
@@ -241,4 +209,10 @@ function toShortDate(date) {
     date.getMonth() + "/" + date.getDay() + "/" + date.getFullYear();
 
   return shortDate;
+}
+
+export function saveImage(url) {
+  const newURL = renameBlob(url);
+
+  return newURL;
 }

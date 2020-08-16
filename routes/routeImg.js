@@ -1,27 +1,32 @@
 import express from "express";
-import multer from "multer";
-import fs from "fs";
 import * as services from "../services/services.js";
+// Azure
+import azureBlob from "@azure/storage-blob";
+import getStream from "into-stream";
+import multer from "multer";
+
+const container = "img";
+const OneMB = 1024 * 1024;
+const uploadOptions = { bufferSize: 4 * OneMB, maxBuffers: 2 };
+
+const sharedKeyCredential = new azureBlob.StorageSharedKeyCredential(
+  process.env.AZURE_STORAGE_ACCOUNT_NAME,
+  process.env.AZURE_STORAGE_ACCOUNT_KEY
+);
+const pipeline = azureBlob.newPipeline(sharedKeyCredential);
+const blobServiceClient = new azureBlob.BlobServiceClient(
+  `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,
+  pipeline
+);
+
+const getBlobName = (originalName) => {
+  const identifier = Math.random().toString().replace(/0\./, "");
+  return `TEMP_${identifier}-${originalName}`;
+};
 
 var router = express.Router();
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./images");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      Date.now()
-        .toString()
-        .trim()
-        .replace(/[:_ -.]/g, "") +
-        Math.floor(Math.random() * 5000 + 1) +
-        file.mimetype.replace("/", ".") +
-        "_TEMP"
-    );
-  },
-});
-const upload = multer({
+var storage = multer.memoryStorage();
+const uploadStrategy = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
     if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg") {
@@ -30,44 +35,47 @@ const upload = multer({
     cb(null, true);
   },
   limits: { fileSize: 4000000 },
-}); //max file size = 4Mb
+}).single("image");
 
 // POST
 
-router.post("/", upload.single("menuiImage"), async (req, res) => {
+router.post("/", uploadStrategy, async (req, res) => {
   const token = req.headers["x-auth-token"];
   if (!token) {
     res.sendStatus(401);
     return;
   }
-  services.validateUserToken(token, (result) => {
-    if (!result) {
-      res.sendStatus(401);
-    } else {
-      try {
-        const image = req.file;
-        if (!image) {
-          res.sendStatus(204);
-        } else {
+  const auth = Boolean(services.validateUserToken(token));
+  if (!auth) {
+    res.sendStatus(401);
+  } else {
+    const blobName = getBlobName(req.file.originalname);
+    const stream = getStream(req.file.buffer);
+    const containerClient = blobServiceClient.getContainerClient(container);
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    const response = {
+      imgURL: `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/img/${blobName}`,
+    };
+
+    try {
+      await blockBlobClient
+        .uploadStream(
+          stream,
+          uploadOptions.bufferSize,
+          uploadOptions.maxBuffers,
+          { blobHTTPHeaders: { blobContentType: "image/jpeg" } }
+        )
+        .then(() => {
+          let blob = containerClient.getBlobClient(blobName);
           setTimeout(() => {
-            fs.unlink(image.path, (err) => {
-              if (err) {
-                console.log("No such file or directory");
-              }
-            });
+            blob.delete();
           }, 1000 * 600);
-          res
-            .status(200)
-            .cookie("img", encodeURI(image.path), {
-              maxAge: 1000 * 600,
-            })
-            .send();
-        }
-      } catch (err) {
-        res.sendStatus(500);
-      }
+          res.send(response);
+        });
+    } catch (err) {
+      console.log(err);
     }
-  });
+  }
 });
 
 export default router;

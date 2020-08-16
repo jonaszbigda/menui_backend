@@ -46,7 +46,7 @@ router.post("/", (req, res) => {
         _id: new mongoose.Types.ObjectId(),
         name: sanitizer.sanitize.keepUnicode(req.body.name),
         city: sanitizer.sanitize.keepUnicode(req.body.city),
-        imgUrl: services.saveImage(req.cookies["img"]),
+        imgUrl: services.saveImage(req.body.imgURL),
         workingHours: req.body.workingHours,
         description: sanitizer.sanitize.keepUnicode(req.body.description),
         tags: req.body.tags,

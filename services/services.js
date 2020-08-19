@@ -3,7 +3,7 @@ import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import mongoose from "mongoose";
 import sanitizer from "string-sanitizer";
-import renameBlob from "./renameBlob.js";
+import { renameBlob } from "./azureServices.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import * as config from "../config/index.js";

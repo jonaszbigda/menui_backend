@@ -1,10 +1,11 @@
 import { removePrefix } from "./azureServices.js";
-import azureBlob from "@azure/storage-blob";
 
 jest.mock("@azure/storage-blob", () => {
-  return jest.fn().mockImplementation(() => {
-    return { StorageSharedKeyCredential: jest.fn() };
-  });
+  return {
+    StorageSharedKeyCredential: jest.fn(),
+    newPipeline: jest.fn(),
+    BlobServiceClient: jest.fn(),
+  };
 });
 
 test("should remove TEMP_ prefix", () => {

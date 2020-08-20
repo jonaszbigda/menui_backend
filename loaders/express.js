@@ -8,7 +8,6 @@ import routeRestaurant from "../routes/routeRestaurant.js";
 import routeUser from "../routes/routeUser.js";
 import routeSearch from "../routes/routeSearch.js";
 import routeImg from "../routes/routeImg.js";
-import cookieParser from "cookie-parser";
 
 export default ({ app, secret }) => {
   const limiter = rateLimiter({
@@ -24,7 +23,6 @@ export default ({ app, secret }) => {
   app.use(function (err, req, res, next) {
     if (err) res.sendStatus(422);
   });
-  app.use(cookieParser(secret));
   app.use("/dish", routeDish);
   app.use("/city", routeCity);
   app.use("/restaurant", routeRestaurant);

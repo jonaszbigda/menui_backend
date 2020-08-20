@@ -9,23 +9,16 @@ var router = express.Router();
 
 // GET RESTAURANT BY ID
 
-router.get("/", (req, res) => {
-  if (req.query.restaurantId.length > 0) {
-    const query = sanitizer.sanitize.keepUnicode(
-      decodeURI(req.query.restaurantId)
-    );
-    services.validateRestaurant(query, (result) => {
-      if (!result) {
-        res.sendStatus(400);
-      } else {
-        Restaurant.findById(query, (err, data) => {
-          if (err) {
-            res.sendStatus(404);
-          } else res.send(data);
-        });
-      }
+router.get("/", async (req, res) => {
+  try {
+    const query = services.decodeAndSanitize(req.query.restaurantId);
+    await services.validateRestaurant(query);
+    Restaurant.findById(query, (err, data) => {
+      if (err) {
+        res.sendStatus(404);
+      } else res.send(data);
     });
-  } else {
+  } catch (error) {
     res.sendStatus(404);
   }
 });
@@ -67,43 +60,33 @@ router.post("/", (req, res) => {
 
 // GET ALL DISHES FROM A RESTAURANT ID
 
-router.get("/dishes", (req, res) => {
-  if (req.query.restaurantId.length > 0) {
-    const query = sanitizer.sanitize.keepUnicode(
-      decodeURI(req.query.restaurantId)
-    );
-
-    services.validateRestaurant(query, (result) => {
-      if (!result) {
-        res.sendStatus(400);
-      } else {
-        Restaurant.findById(query, (err, result) => {
-          if (err) {
-            res.sendStatus(404);
+router.get("/dishes", async (req, res) => {
+  try {
+    const query = services.decodeAndSanitize(req.query.restaurantId);
+    await services.validateRestaurant(query);
+    let restaurant = await services.fetchRestaurant(query);
+    let dishesCount = restaurant.dishes.length;
+    let dishes = [];
+    let dishes2 = await services.fetchAllDishesForRestaurant(restaurant);
+    console.log(dishes2);
+    restaurant.dishes.forEach((element) => {
+      Dish.findById(element._id, (err, result) => {
+        if (err) {
+          res.sendStatus(500);
+        } else {
+          if (result === null) {
+            dishesCount--;
+            if (dishes.length == dishesCount) res.send(dishes);
           } else {
-            var dishesCount = result.dishes.length;
-            let dishes = [];
-            result.dishes.forEach((element) => {
-              Dish.findById(element, (err, result) => {
-                if (err) {
-                  res.sendStatus(500);
-                } else {
-                  if (result === null) {
-                    dishesCount--;
-                    if (dishes.length == dishesCount) res.send(dishes);
-                  } else {
-                    dishes.push(result);
-                    if (dishes.length == dishesCount) res.send(dishes);
-                  }
-                }
-              });
-            });
+            dishes.push(result);
+            if (dishes.length == dishesCount) res.send(dishes);
           }
-        });
-      }
+        }
+      });
     });
-  } else {
-    res.sendStatus(404);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(400);
   }
 });
 

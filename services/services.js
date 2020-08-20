@@ -9,16 +9,40 @@ import bcrypt from "bcrypt";
 import * as config from "../config/index.js";
 const { jwtSecret } = config;
 
-export function validateRestaurant(id, callback) {
-  if (mongoose.Types.ObjectId.isValid(id)) {
-    Restaurant.exists({ _id: id }, (err, res) => {
+export async function validateRestaurant(id) {
+  if (!mongoose.Types.ObjectId.isValid(id)) throw "Invalid ID";
+  let valid = await Restaurant.exists({ _id: id });
+  if (valid !== true) throw "Restaurant doesn't exist";
+  return true;
+}
+
+export async function fetchRestaurant(id) {
+  let data;
+  await Restaurant.findById(id, (err, result) => {
+    data = result;
+  }).catch((e) => {
+    throw "Couldn't fetch restaurant";
+  });
+  return data;
+}
+
+export async function fetchAllDishesForRestaurant(restaurant) {
+  let dishes = [];
+  await restaurant.dishes.forEach((element) => {
+    Dish.findById(element._id, (err, result) => {
       if (err) {
-        callback(false);
+        console.log(err);
       } else {
-        callback(res);
+        dishes.push(result);
+        console.log(result);
       }
     });
-  } else callback(false);
+  });
+  return dishes;
+}
+
+export async function fetchDish(id) {
+  foo;
 }
 
 export function fetchUser(email, callback) {
@@ -29,6 +53,11 @@ export function fetchUser(email, callback) {
       callback(res);
     }
   });
+}
+
+export function decodeAndSanitize(query) {
+  if (!query) throw "Nothing to sanitize...";
+  return sanitizer.sanitize.keepUnicode(decodeURI(query));
 }
 
 export function generateAuthToken(user) {
@@ -200,19 +229,17 @@ export function composeNewContact(request) {
       },
     ],
   };
-
   return contact;
 }
 
-function toShortDate(date) {
+export function toShortDate(date) {
+  if (!date) return false;
   const shortDate =
     date.getMonth() + "/" + date.getDay() + "/" + date.getFullYear();
-
   return shortDate;
 }
 
 export function saveImage(url) {
   const newURL = renameBlob(url);
-
   return newURL;
 }

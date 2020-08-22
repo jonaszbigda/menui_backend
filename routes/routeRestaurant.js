@@ -1,7 +1,6 @@
 import express from "express";
 import * as services from "../services/services.js";
 import Restaurant from "../models/restaurant.js";
-import Dish from "../models/dish.js";
 import sanitizer from "string-sanitizer";
 import mongoose from "mongoose";
 
@@ -65,25 +64,8 @@ router.get("/dishes", async (req, res) => {
     const query = services.decodeAndSanitize(req.query.restaurantId);
     await services.validateRestaurant(query);
     let restaurant = await services.fetchRestaurant(query);
-    let dishesCount = restaurant.dishes.length;
-    let dishes = [];
-    let dishes2 = await services.fetchAllDishesForRestaurant(restaurant);
-    console.log(dishes2);
-    restaurant.dishes.forEach((element) => {
-      Dish.findById(element._id, (err, result) => {
-        if (err) {
-          res.sendStatus(500);
-        } else {
-          if (result === null) {
-            dishesCount--;
-            if (dishes.length == dishesCount) res.send(dishes);
-          } else {
-            dishes.push(result);
-            if (dishes.length == dishesCount) res.send(dishes);
-          }
-        }
-      });
-    });
+    let dishes = await services.fetchAllDishesForRestaurant(restaurant);
+    res.send(dishes);
   } catch (error) {
     console.log(error);
     res.sendStatus(400);

@@ -16,66 +16,47 @@ var error = function (err) {
   console.log("Task failed successfully");
 };
 
-router.post("/login", (req, res) => {
-  if (req.body.password && req.body.email) {
-    services.fetchUser(req.body.email, (result) => {
-      if (!result) {
-        res.sendStatus(404);
-      } else {
-        var user = result;
-        bcrypt.compare(req.body.password, user.password, function (
-          err,
-          result
-        ) {
-          if (err) {
-            res.sendStatus(500);
-          } else {
-            if (result) {
-              const userNoPass = {
-                firstname: user.firstname,
-                lastname: user.lastname,
-                email: user.email,
-                id: user._id,
-              };
-              var token = services.generateAuthToken(userNoPass);
-              res.header("x-auth-token", token).status(202).send(userNoPass);
-            } else {
-              res.sendStatus(401);
-            }
-          }
-        });
-      }
-    });
-  } else {
-    res.sendStatus(404);
+// LOGIN
+router.post("/login", async (req, res) => {
+  try {
+    if (!req.body.password || !req.body.email) {
+      throw services.newError("No input data", 204);
+    }
+    const user = await services.fetchUser(req.body.email);
+    /* await services.checkPassword(req.body.password, user.password);
+    const userNoPass = {
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      id: user._id,
+    };
+    var token = services.generateAuthToken(userNoPass);
+    res.header("x-auth-token", token).status(202).send(userNoPass); */
+    res.send(user);
+  } catch (error) {
+    services.handleError(error, res);
   }
 });
 
-router.post("/register", (req, res) => {
-  services.checkEmailTaken(req.body.email, (result) => {
-    if (result) {
-      res.sendStatus(409);
-    } else {
-      services.hashPass(req.body.password, (hashedPass) => {
-        const user = new User({
-          _id: new mongoose.Types.ObjectId(),
-          email: req.body.email,
-          password: hashedPass,
-          firstname: req.body.firstname,
-          lastname: req.body.lastname,
-        });
-        user.save((err) => {
-          if (err) {
-            res.sendStatus(500);
-          } else {
-            const contact = services.composeNewContact(user);
-            agileAPI.contactAPI.add(contact, success, error);
-            res.sendStatus(201);
-          }
-        });
-      });
-    }
-  });
+// REGISTER
+router.post("/register", async (req, res) => {
+  try {
+    await services.checkEmailTaken(req.body.email);
+    const password = await services.hashPass(req.body.password);
+    const user = new User({
+      _id: new mongoose.Types.ObjectId(),
+      email: req.body.email,
+      password: password,
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+    });
+    await user.save();
+    const contact = services.composeNewContact(user);
+    agileAPI.contactAPI.add(contact, success, error);
+    res.sendStatus(201);
+  } catch (e) {
+    services.handleError(e, res);
+  }
 });
 
 export default router;

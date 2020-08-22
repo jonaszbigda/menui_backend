@@ -9,8 +9,24 @@ import bcrypt from "bcrypt";
 import * as config from "../config/index.js";
 const { jwtSecret } = config;
 
+export function newError(message, status) {
+  const error = {
+    message: message,
+    status: status,
+  };
+  return error;
+}
+
+export function handleError(error, responseObject) {
+  if (!error.message) {
+    responseObject.sendStatus(500);
+  } else {
+    responseObject.status(error.status).send(error.message);
+  }
+}
+
 export async function validateRestaurant(id) {
-  if (!mongoose.Types.ObjectId.isValid(id)) throw "Invalid ID";
+  if (!mongoose.Types.ObjectId.isValid(id)) throw newError("Invalid ID", 204);
   let valid = await Restaurant.exists({ _id: id });
   if (valid !== true) throw "Restaurant doesn't exist";
   return true;
@@ -28,36 +44,32 @@ export async function fetchRestaurant(id) {
 
 export async function fetchAllDishesForRestaurant(restaurant) {
   let dishes = [];
-  await restaurant.dishes.forEach((element) => {
-    Dish.findById(element._id, (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        dishes.push(result);
-        console.log(result);
-      }
-    });
-  });
+  for (const dish of restaurant.dishes) {
+    let res = await fetchDish(dish._id);
+    if (res !== null) dishes.push(res);
+  }
   return dishes;
 }
 
 export async function fetchDish(id) {
-  foo;
+  let data = await Dish.findById(id).catch((e) => {
+    throw `Couldn't fetch ${id}`;
+  });
+  return data;
 }
 
-export function fetchUser(email, callback) {
-  User.findOne({ email: email }, (err, res) => {
-    if (err || res === null) {
-      callback(false);
-    } else {
-      callback(res);
-    }
-  });
+export async function fetchUser(email) {
+  if (!email) throw newError("No input", 404);
+  User.findOne({ email: email });
 }
 
 export function decodeAndSanitize(query) {
   if (!query) throw "Nothing to sanitize...";
   return sanitizer.sanitize.keepUnicode(decodeURI(query));
+}
+
+export async function checkPassword(password, hash) {
+  bcrypt.compare(password, hash);
 }
 
 export function generateAuthToken(user) {
@@ -75,14 +87,17 @@ export function generateAuthToken(user) {
   return token;
 }
 
-export function checkEmailTaken(email, callback) {
-  User.exists({ email: email }, (err, res) => {
-    if (err) {
-      callback(false);
-    } else {
-      callback(res);
-    }
-  });
+export async function checkEmailTaken(email) {
+  if (!email) throw newError("No input email", 204);
+  await User.exists({ email: email })
+    .then((res) => {
+      if (res) {
+        throw newError("Email is taken", 409);
+      }
+    })
+    .catch((e) => {
+      throw e;
+    });
 }
 
 export function validateUserToken(token) {
@@ -179,17 +194,14 @@ export function halfYearFromNowDate() {
   return toShortDate(resultDate);
 }
 
-export function hashPass(pass, callback) {
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) callback(false);
-    bcrypt.hash(pass, salt, function (err, hash) {
-      if (err) {
-        callback(false);
-      } else {
-        callback(hash);
-      }
-    });
-  });
+export async function hashPass(pass) {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(pass, salt);
+    return hash;
+  } catch (error) {
+    throw newError("Internal error", 500);
+  }
 }
 
 export function dueDateBasedOnSubscription(subscriptionActive) {

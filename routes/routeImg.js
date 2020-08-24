@@ -20,17 +20,12 @@ const uploadStrategy = multer({
 // POST
 
 router.post("/", uploadStrategy, async (req, res) => {
-  const token = req.headers["x-auth-token"];
-  if (!token) {
-    res.sendStatus(401);
-    return;
-  }
-  const auth = Boolean(services.validateUserToken(token));
-  if (!auth) {
-    res.sendStatus(401);
-    return;
-  } else {
+  try {
+    const token = req.headers["x-auth-token"];
+    services.validateUserToken(token);
     await uploadBlob(req, res);
+  } catch (error) {
+    services.handleError(error, res);
   }
 });
 

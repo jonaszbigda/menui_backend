@@ -3,7 +3,6 @@ import cors from "cors";
 import rateLimiter from "express-rate-limit";
 import helmet from "helmet";
 import routeDish from "../routes/routeDish.js";
-import routeCity from "../routes/routeCity.js";
 import routeRestaurant from "../routes/routeRestaurant.js";
 import routeUser from "../routes/routeUser.js";
 import routeSearch from "../routes/routeSearch.js";
@@ -25,7 +24,6 @@ export default ({ app, secret }) => {
     if (err) res.sendStatus(422);
   });
   app.use("/dish", routeDish);
-  app.use("/city", routeCity);
   app.use("/restaurant", routeRestaurant);
   app.use("/img", routeImg);
   app.use("/user", routeUser);

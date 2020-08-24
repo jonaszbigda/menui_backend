@@ -28,7 +28,7 @@ export function handleError(error, responseObject) {
 export async function validateRestaurant(id) {
   if (!mongoose.Types.ObjectId.isValid(id)) throw newError("Invalid ID", 204);
   let valid = await Restaurant.exists({ _id: id });
-  if (valid !== true) throw "Restaurant doesn't exist";
+  if (valid !== true) throw newError("Restaurant doesn't exist", 404);
   return true;
 }
 
@@ -37,7 +37,7 @@ export async function fetchRestaurant(id) {
   await Restaurant.findById(id, (err, result) => {
     data = result;
   }).catch((e) => {
-    throw "Couldn't fetch restaurant";
+    throw newError("Couldn't fetch restaurant", 500);
   });
   return data;
 }
@@ -53,23 +53,36 @@ export async function fetchAllDishesForRestaurant(restaurant) {
 
 export async function fetchDish(id) {
   let data = await Dish.findById(id).catch((e) => {
-    throw `Couldn't fetch ${id}`;
+    throw newError(`Couldn't fetch ${id}`, 404);
   });
   return data;
 }
 
 export async function fetchUser(email) {
-  if (!email) throw newError("No input", 404);
-  User.findOne({ email: email });
+  if (!email) throw newError("No input", 204);
+  const user = await User.findOne({ email: email });
+  if (!user) throw newError("No such user...", 404);
+  return user;
 }
 
 export function decodeAndSanitize(query) {
-  if (!query) throw "Nothing to sanitize...";
+  if (!query) throw newError("Nothing to sanitize...", 204);
   return sanitizer.sanitize.keepUnicode(decodeURI(query));
 }
 
 export async function checkPassword(password, hash) {
-  bcrypt.compare(password, hash);
+  const result = await bcrypt.compare(password, hash);
+  if (!result) throw newError("Wrong password :(", 401);
+}
+
+export function prepareSafeUser(user) {
+  const safeUser = {
+    firstname: user.firstname,
+    lastname: user.lastname,
+    email: user.email,
+    id: user._id,
+  };
+  return safeUser;
 }
 
 export function generateAuthToken(user) {
@@ -89,40 +102,38 @@ export function generateAuthToken(user) {
 
 export async function checkEmailTaken(email) {
   if (!email) throw newError("No input email", 204);
-  await User.exists({ email: email })
-    .then((res) => {
-      if (res) {
-        throw newError("Email is taken", 409);
-      }
-    })
-    .catch((e) => {
-      throw e;
-    });
+  await User.exists({ email: email }).then((res) => {
+    if (res) {
+      throw newError("Email is taken", 409);
+    }
+  });
 }
 
 export function validateUserToken(token) {
-  let verified;
-  try {
-    verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
-  } catch (error) {
-    verified = false;
+  if (!token) throw newError("Invalid user token", 401);
+  const verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
+  if (!verified) throw newError("Invalid user token", 401);
+}
+
+export function validateDishId(id) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw newError("Invalid ID", 400);
   }
-  return verified; // should be return verified for production
+  const dishDoesExist = Dish.exists({ _id: id });
+  if (!dishDoesExist) throw newError("Dish doesn't exist", 404);
 }
 
-export function validateDishId(id, callback) {
-  if (mongoose.Types.ObjectId.isValid(id)) {
-    Dish.exists({ _id: id }, (err, res) => {
-      if (err) {
-        callback(false);
-      } else {
-        callback(res);
-      }
-    });
-  } else callback(false);
+export async function addDishToRestaurant(restaurantId, dishId) {
+  await Restaurant.updateOne(
+    { _id: restaurantId },
+    { $push: { dishes: dishId } }
+  ).catch((error) => {
+    throw newError("Couldn't add dish to restaurant", 500);
+  });
 }
 
-export function createDish(dish, cookie, generateId) {
+export function createDish(dish, generateId) {
+  // TEST THIS ONE!!!!!
   if (generateId) {
     const newDish = new Dish({
       _id: new mongoose.Types.ObjectId(),
@@ -130,7 +141,7 @@ export function createDish(dish, cookie, generateId) {
       category: dish.category,
       price: dish.price,
       notes: sanitizer.sanitize.keepUnicode(dish.notes),
-      imgUrl: saveImage(cookie),
+      imgUrl: dish.imgUrl,
       weight: dish.weight,
       allergens: {
         gluten: dish.allergens.gluten,
@@ -152,7 +163,7 @@ export function createDish(dish, cookie, generateId) {
       category: dish.category,
       price: dish.price,
       notes: sanitizer.sanitize.keepUnicode(dish.notes),
-      imgUrl: chooseImg(cookie),
+      imgUrl: dish.imgUrl,
       weight: dish.weight,
       allergens: {
         gluten: dish.allergens.gluten,
@@ -171,13 +182,44 @@ export function createDish(dish, cookie, generateId) {
   }
 }
 
+export function createRestaurant(request) {
+  try {
+    const restaurant = new Restaurant({
+      _id: new mongoose.Types.ObjectId(),
+      name: sanitizer.sanitize.keepUnicode(request.body.name),
+      city: sanitizer.sanitize.keepUnicode(request.body.city),
+      imgUrl: services.saveImage(request.body.imgURL),
+      workingHours: request.body.workingHours,
+      description: sanitizer.sanitize.keepUnicode(request.body.description),
+      tags: request.body.tags,
+      links: request.body.links,
+      phone: request.body.phone,
+      hidden: request.body.hidden,
+    });
+    return restaurant;
+  } catch (error) {
+    throw newError("Invalid input data", 206);
+  }
+}
+
+export async function createUser(request) {
+  const password = await hashPass(request.body.password);
+  const user = new User({
+    _id: new mongoose.Types.ObjectId(),
+    email: request.body.email,
+    password: password,
+    firstname: request.body.firstname,
+    lastname: request.body.lastname,
+  });
+  return user;
+}
+
 export function yearFromNowDate() {
   Date.prototype.addDays = function (days) {
     var date = new Date(this.valueOf());
     date.setDate(date.getDate() + days);
     return date;
   };
-
   var date = new Date();
   return date.addDays(365);
 }

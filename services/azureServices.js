@@ -1,5 +1,6 @@
 import azureBlob from "@azure/storage-blob";
 import getStream from "into-stream";
+import { newError } from "./services.js";
 
 // SETUP
 const containerURL = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/img/`;
@@ -17,14 +18,18 @@ const blobServiceClient = new azureBlob.BlobServiceClient(
 );
 
 // CODE
-export function renameBlob(blobURL) {
-  const blobName = blobURL.replace(containerURL, "");
-  const containerClient = blobServiceClient.getContainerClient(container);
-  const tempBlob = containerClient.getBlobClient(blobName);
-  const newBlob = containerClient.getBlobClient(removePrefix(blobName));
+export async function renameBlob(blobURL) {
+  try {
+    const blobName = blobURL.replace(containerURL, "");
+    const containerClient = blobServiceClient.getContainerClient(container);
+    const tempBlob = containerClient.getBlobClient(blobName);
+    const newBlob = containerClient.getBlobClient(removePrefix(blobName));
 
-  newBlob.syncCopyFromURL(tempBlob.url);
-  return newBlob.url;
+    await newBlob.syncCopyFromURL(tempBlob.url);
+    return newBlob.url;
+  } catch (e) {
+    throw newError("Unable to save image", 500);
+  }
 }
 
 export async function uploadBlob(request, resp) {
@@ -50,6 +55,7 @@ export async function uploadBlob(request, resp) {
       });
   } catch (err) {
     console.log(err);
+    throw newError("Unable to save image", 500);
   }
 }
 

@@ -12,6 +12,22 @@ const restaurantSchema = mongoose.Schema({
     maxlength: 128,
     required: true,
   },
+  adress: {
+    type: String,
+    maxlength: 128,
+    required: true,
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  },
   imgUrl: {
     type: String,
     required: true,

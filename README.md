@@ -46,6 +46,7 @@
 - ### **Dish**
 
   - ##### **\_id**: _mongoose.Types.ObjectId_
+  - ##### **restaurantId**: _mongoose.Types.ObjectId_
   - ##### **name**: _String_ (max: 128, required)
   - ##### **category**: _String_ (max: 64, required)
   - ##### **price**: _Number_ (required)
@@ -87,9 +88,9 @@
   - #### **POST**
     Takes in **restaurantId**, **dish** document, and a JWT **token (header)** as parameters and tries to create a new dish document inside a database. Returns **201** on success. Else returns **401** on bad token, or **400** on wrong **restaurantId**.
   - #### **PUT**
-
-    Takes in **dishId**, **dish** document, and a JWT **token (header)** and tries to update specified document in a database. Returns **304** on success. Else returns **204** on bad document, or **401** on bad token.
-
+    Takes in **dishId**, **restaurantId**, **dish** document, and a JWT **token (header)** and tries to update specified document in a database. Returns **304** on success. Else returns **204** on bad document, or **401** on bad token.
+  - #### **DELETE**
+    Takes in **dishId**, and JWT **token (header)** and tries to remove specified dish from database. If everything goes OK, it returns **200**.
     <br>
 
 * ### **/restaurant**

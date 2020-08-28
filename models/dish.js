@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const dishSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
+  restaurantId: mongoose.Types.ObjectId,
   name: {
     type: String,
     maxlength: 128,
@@ -36,7 +37,7 @@ const dishSchema = mongoose.Schema({
     sesame: Boolean,
   },
   ingredients: {
-    type: Array,
+    type: [String],
   },
   vegan: Boolean,
   vegetarian: Boolean,

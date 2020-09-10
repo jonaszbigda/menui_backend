@@ -1,5 +1,5 @@
 import Restaurant from "../models/restaurant.js";
-import {} from "./dataPrepServices.js";
+import crypto from "crypto";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import mongoose from "mongoose";
@@ -57,6 +57,22 @@ export function generateAuthToken(user) {
     { expiresIn: "1h" }
   );
   return token;
+}
+
+function generatePasswordResetToken(email) {
+  const token = jwt.sign(
+    {
+      email: email,
+    },
+    jwtSecret,
+    { expiresIn: "15m" }
+  );
+  return token;
+}
+
+export function generatePasswordResetLink(email) {
+  const token = generatePasswordResetToken(email);
+  const link = `htt`;
 }
 
 export async function checkEmailTaken(email) {

@@ -1,8 +1,6 @@
 import Restaurant from "../models/restaurant.js";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
-import mongoose from "mongoose";
-import sanitizer from "string-sanitizer";
 import { newError } from "./services.js";
 
 export async function changeUserPass(userId, newPass) {

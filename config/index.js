@@ -8,3 +8,4 @@ export const jwtSecret = process.env.JWT_SECRET;
 export const CRM_KEY = process.env.CRM_KEY;
 export const CRM_USER = process.env.CRM_USER;
 export const CRM_EMAIL = process.env.CRM_EMAIL;
+export const MAIL_PASS = process.env.MAIL_PASS;

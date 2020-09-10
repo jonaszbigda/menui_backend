@@ -16,6 +16,7 @@ import {
 } from "../services/services.js";
 import * as config from "../config/index.js";
 import AgileCRMManager from "agile_crm";
+import { resetPassword } from "../services/mailServices.js";
 const { CRM_USER, CRM_EMAIL, CRM_KEY } = config;
 
 var router = express.Router();
@@ -69,13 +70,18 @@ router.post("/changepass", async (req, res) => {
   }
 });
 
-// RESET PASSWORD
-router.post("/resetpassword", (req, res) => {
+// REQUEST PASSWORD RESET
+router.post("/forgotpassword", async (req, res) => {
   try {
-    //
+    await resetPassword(req.body.email);
+    res.send(
+      "Link do utworzenia nowego hasła został wysłany na adres email powiązany z kontem. Sprawdź również folder SPAM."
+    );
   } catch (error) {
     handleError(error, res);
   }
 });
+
+// RESET PASS
 
 export default router;

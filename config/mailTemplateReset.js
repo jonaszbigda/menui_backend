@@ -1,6 +1,6 @@
 export default function makeResetPassMessage(newPass) {
-  return;
-  `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  return {
+    html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -77,9 +77,9 @@ export default function makeResetPassMessage(newPass) {
                   <td>
                     <img
                       class="logo"
-                      src="../images/logo.svg"
+                      src="cid:logo"
                       width="100"
-                      alt="logo"
+                      alt="Menui - food guide"
                     />
                   </td>
                 </tr>
@@ -126,7 +126,7 @@ export default function makeResetPassMessage(newPass) {
               <table align="center">
                 <tr>
                   <td>
-                    <p class="footer">Pozdrawiamy!</p>
+                    <p class="footer">Pozdrawiamy! - Zespół Menui</p>
                   </td>
                 </tr>
               </table>
@@ -134,5 +134,7 @@ export default function makeResetPassMessage(newPass) {
           </tr>
         </table>
       </body>
-    </html>`;
+    </html>`,
+    text: `Drogi użytkowniku, dostałeś tę wiadomość, ponieważ użyłeś opcji "Nie pamiętam hasła" w aplikacji Menui. Twoje tymczasowe hasło to: ${newPass}. Zaloguj się za jego pomocą i ustaw nowe bezpieczne hasło. Jeżeli nie wysyłałeś prośby o zmianę hasła, prosimy zignoruj tę wiadomość. Pozdrawiamy - Zespół Menui`,
+  };
 }

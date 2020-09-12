@@ -5,7 +5,12 @@ import {
   fetchRestaurant,
   fetchAllDishesForRestaurant,
 } from "../services/databaseServices.js";
-import * as services from "../services/services.js";
+import {
+  decodeAndSanitize,
+  validateRestaurant,
+  handleError,
+  validateUserToken,
+} from "../services/services.js";
 import Restaurant from "../models/restaurant.js";
 
 var router = express.Router();
@@ -14,11 +19,11 @@ var router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const query = services.decodeAndSanitize(req.query.restaurantId);
-    await services.validateRestaurant(query);
+    const query = decodeAndSanitize(req.query.restaurantId);
+    await validateRestaurant(query);
     Restaurant.findById(query).then((data) => res.send(data));
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
   }
 });
 
@@ -27,13 +32,13 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
-    const user = services.validateUserToken(token);
+    const user = validateUserToken(token);
     const restaurant = createRestaurant(req.body);
     await restaurant.save();
     await addRestaurantToUser(user, restaurant);
     res.sendStatus(201);
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
   }
 });
 
@@ -41,13 +46,28 @@ router.post("/", async (req, res) => {
 
 router.get("/dishes", async (req, res) => {
   try {
-    const query = services.decodeAndSanitize(req.query.restaurantId);
-    await services.validateRestaurant(query);
+    const query = decodeAndSanitize(req.query.restaurantId);
+    await validateRestaurant(query);
     let restaurant = await fetchRestaurant(query);
     let dishes = await fetchAllDishesForRestaurant(restaurant);
     res.send(dishes);
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
+  }
+});
+
+// DELETE RESTAURANT
+
+router.post("/delete", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    await validateRestaurant(req.body.restaurantId);
+    //check access
+    //delete restaurant
+    res.send("Restauracja została pomyślnie usunięta.");
+  } catch (error) {
+    handleError(error, res);
   }
 });
 

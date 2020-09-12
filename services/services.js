@@ -1,5 +1,4 @@
 import Restaurant from "../models/restaurant.js";
-import crypto from "crypto";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import mongoose from "mongoose";
@@ -72,7 +71,8 @@ function generatePasswordResetToken(email) {
 
 export function generatePasswordResetLink(email) {
   const token = generatePasswordResetToken(email);
-  const link = `htt`;
+  const link = `https://www.menui.pl/forgot?token=${token}`;
+  return link;
 }
 
 export async function checkEmailTaken(email) {
@@ -133,6 +133,9 @@ export function halfYearFromNowDate() {
 }
 
 export async function hashPass(pass) {
+  if (pass.length < 6) {
+    throw newError("Hasło za krótkie.", 500);
+  }
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(pass, salt);

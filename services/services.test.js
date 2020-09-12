@@ -17,8 +17,3 @@ jest.mock("bcrypt", () => {
 test("should return false for no date on input", () => {
   expect(toShortDate()).toBe(false);
 });
-
-test("should generate random 10 characters long password", () => {
-  let generatedPass = generateNewPassword();
-  expect(generatedPass.length).toBe(10);
-});

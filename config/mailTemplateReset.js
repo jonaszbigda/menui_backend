@@ -1,4 +1,4 @@
-export default function makeResetPassMessage(newPass) {
+export default function makeResetPassMessage(link) {
   return {
     html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -36,7 +36,8 @@ export default function makeResetPassMessage(newPass) {
             line-height: 1.6;
           }
           .logo {
-            margin: 24px;
+            padding-top: 30px;
+            padding-bottom: 30px;
           }
           .footer {
             font-size: 13px;
@@ -50,13 +51,15 @@ export default function makeResetPassMessage(newPass) {
             margin-bottom: 26px;
             color: #d68000;
           }
-          .span {
-            color: #262626;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            font-size: 16px;
+          .link {
+            padding: 16px;
+            font-size: 14px;
             font-weight: 700;
             background-color: #d68000;
+          }
+          .link a {
+            color: #262626;
+            text-decoration: none;
           }
         </style>
       </head>
@@ -72,15 +75,10 @@ export default function makeResetPassMessage(newPass) {
         >
           <tr>
             <td>
-              <table align="center">
+              <table align="center" class="logo">
                 <tr>
                   <td>
-                    <img
-                      class="logo"
-                      src="cid:logo"
-                      width="100"
-                      alt="Menui - food guide"
-                    />
+                    <img src="cid:logo" width="100" alt="Menui - food guide" />
                   </td>
                 </tr>
               </table>
@@ -107,12 +105,21 @@ export default function makeResetPassMessage(newPass) {
                       Drogi użytkowniku, dostałeś tę wiadomość, ponieważ użyłeś
                       opcji "Nie pamiętam hasła" w aplikacji Menui.
                     </p>
+                    <p>Kliknij w ten link, by ustawić nowe hasło:</p>
+                    <table width="100%">
+                      <tr>
+                        <td>
+                          <table width="30%" align="center" class="link">
+                            <tr>
+                              <td>
+                                <a href="${link}">Resetuj hasło</a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
                     <p>
-                      Twoje tymczasowe hasło to:
-                      <span><h5 class="span">${newPass}</h5></span>
-                    </p>
-                    <p>
-                      Zaloguj się za jego pomocą i ustaw nowe bezpieczne hasło.
                       Jeżeli nie wysyłałeś prośby o zmianę hasła, prosimy zignoruj
                       tę wiadomość.
                     </p>
@@ -134,7 +141,8 @@ export default function makeResetPassMessage(newPass) {
           </tr>
         </table>
       </body>
-    </html>`,
-    text: `Drogi użytkowniku, dostałeś tę wiadomość, ponieważ użyłeś opcji "Nie pamiętam hasła" w aplikacji Menui. Twoje tymczasowe hasło to: ${newPass}. Zaloguj się za jego pomocą i ustaw nowe bezpieczne hasło. Jeżeli nie wysyłałeś prośby o zmianę hasła, prosimy zignoruj tę wiadomość. Pozdrawiamy - Zespół Menui`,
+    </html>
+    `,
+    text: `Drogi użytkowniku, dostałeś tę wiadomość, ponieważ użyłeś opcji "Nie pamiętam hasła" w aplikacji Menui. Twoje tymczasowe hasło to: ${link}. Zaloguj się za jego pomocą i ustaw nowe bezpieczne hasło. Jeżeli nie wysyłałeś prośby o zmianę hasła, prosimy zignoruj tę wiadomość. Pozdrawiamy - Zespół Menui`,
   };
 }

@@ -5,18 +5,34 @@ import { newError } from "./services.js";
 
 export async function changeUserPass(userId, newPass) {
   User.findByIdAndUpdate(userId, { $set: { password: newPass } }).catch((e) => {
-    throw newError("Cannot change password", 500);
+    throw newError("Zmiana hasła nie powiodła się.", 500);
   });
 }
 
 export async function removeDish(dishId) {
   const deletedDoc = await Dish.findByIdAndDelete(dishId).catch((e) => {
-    throw newError("Unable to delete Dish", 500);
+    throw newError("Usunięcie dania nie powiodło się.", 500);
   });
   await Restaurant.findByIdAndUpdate(deletedDoc.restaurantId, {
     $pull: { dishes: dishId },
   }).catch((error) => {
-    throw newError("Unable to remove Dish from restaurant", 500);
+    throw newError("Usunięcie dania z restauracji nie powiodło się.", 500);
+  });
+}
+
+export async function removeRestaurant(restaurantId, userId) {
+  const deletedDoc = await Restaurant.findByIdAndDelete(restaurantId).catch(
+    (e) => {
+      throw newError("Usunięcie nie powiodło się.", 500);
+    }
+  );
+  await User.findByIdAndUpdate(userId, {
+    $pull: { restaurants: restaurantId },
+  }).catch((e) => {
+    throw newError(
+      "Usunięcie restauracji z użytkownika nie powiodło się.",
+      500
+    );
   });
 }
 

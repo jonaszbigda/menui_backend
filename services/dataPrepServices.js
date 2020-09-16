@@ -31,6 +31,21 @@ export function composeNewContact(request) {
         name: "UserID",
         value: request._id,
       },
+      {
+        type: "CUSTOM",
+        name: "NIP",
+        value: request.NIP,
+      },
+      {
+        type: "CUSTOM",
+        name: "CompanyName",
+        value: request.companyName,
+      },
+      {
+        type: "CUSTOM",
+        name: "CompanyAdress",
+        value: request.adress,
+      },
     ],
   };
   return contact;
@@ -44,6 +59,11 @@ export async function createUser(request) {
     password: password,
     firstname: request.body.firstname,
     lastname: request.body.lastname,
+    billing: {
+      NIP: request.body.NIP,
+      adress: request.body.adress,
+      companyName: request.body.companyName,
+    },
   });
   return user;
 }

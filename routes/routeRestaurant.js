@@ -4,12 +4,14 @@ import {
   addRestaurantToUser,
   fetchRestaurant,
   fetchAllDishesForRestaurant,
+  removeRestaurant,
 } from "../services/databaseServices.js";
 import {
   decodeAndSanitize,
   validateRestaurant,
   handleError,
   validateUserToken,
+  verifyRestaurantAccess,
 } from "../services/services.js";
 import Restaurant from "../models/restaurant.js";
 
@@ -63,8 +65,8 @@ router.post("/delete", async (req, res) => {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
     await validateRestaurant(req.body.restaurantId);
-    //check access
-    //delete restaurant
+    await verifyRestaurantAccess(req.body.restaurantId, user);
+    await removeRestaurant(req.body.restaurantId, user.id);
     res.send("Restauracja została pomyślnie usunięta.");
   } catch (error) {
     handleError(error, res);

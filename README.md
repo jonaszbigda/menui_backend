@@ -73,6 +73,10 @@
   - ##### **password**: _String_ (required)
   - ##### **firstname**: _String_ (required)
   - ##### **lastname**: _String_ (required)
+  - ##### **billing**
+    - ##### **NIP**: _String_
+    - ##### **adress**: _String_
+    - ##### **companyName**: _String_
   - ##### **restaurants**: [*mongoose.Types.ObjectId*]
   - ##### **trialUsed**: _Boolean_
   <br>
@@ -111,6 +115,14 @@
 
     <br>
 
+- ### **/restaurant/delete**
+
+  - #### **POST**
+
+    Takes a **restaurantId** parameter and a **JWT token(header)**, and tries to remove the restaurant from the database and from user. If successfull returns **200**, if failed returns error with a code.
+
+    <br>
+
 * ### **/img**
 
   - #### **POST**
@@ -132,6 +144,22 @@
   - #### **POST**
 
     Takes **email, password, firstname, lastname** parameters and tries to register the user in the database. Returns **201** if succeeded. Else returns **409** on email taken, and **500** on unknown error.
+
+    <br>
+
+* ### **/user/forgotpassword**
+
+  - #### **POST**
+
+    Takes **email** parameter and if it exists, generates and sends an pass reset link via the email to the owner of the account.
+
+    <br>
+
+* ### **/user/resetpass**
+
+  - #### **POST**
+
+    Takes **token, email, newPass** parameters and if everything checks out, changes user password to the supplied **newPass**.
 
     <br>
 

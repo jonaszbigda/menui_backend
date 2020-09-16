@@ -18,6 +18,20 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  billing: {
+    NIP: {
+      type: String,
+      required: true,
+    },
+    adress: {
+      type: String,
+      required: true,
+    },
+    companyName: {
+      type: String,
+      required: true,
+    },
+  },
   restaurants: [mongoose.Types.ObjectId],
   trialUsed: Boolean,
 });

@@ -27,20 +27,21 @@ export function handleError(error, responseObject) {
 }
 
 export async function validateRestaurant(id) {
-  if (!mongoose.Types.ObjectId.isValid(id)) throw newError("Invalid ID", 204);
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw newError("Nieprawidłowy ID", 204);
   let valid = await Restaurant.exists({ _id: id });
-  if (valid !== true) throw newError("Restaurant doesn't exist", 404);
+  if (valid !== true) throw newError("Restauracja nie istnieje w bazie.", 404);
   return true;
 }
 
 export function decodeAndSanitize(query) {
-  if (!query) throw newError("Nothing to sanitize...", 204);
+  if (!query) throw newError("Brak danych.", 204);
   return sanitizer.sanitize.keepUnicode(decodeURI(query));
 }
 
 export async function checkPassword(password, hash) {
   const result = await bcrypt.compare(password, hash);
-  if (!result) throw newError("Wrong password :(", 401);
+  if (!result) throw newError("Hasło nieprawidłowe", 401);
 }
 
 export function generateAuthToken(user) {
@@ -49,6 +50,7 @@ export function generateAuthToken(user) {
       email: user.email,
       firstname: user.firstname,
       lastname: user.lastname,
+      billing: user.billing,
       id: user.id,
       restaurants: user.restaurants,
     },
@@ -76,39 +78,58 @@ export function generatePasswordResetLink(email) {
 }
 
 export async function checkEmailTaken(email) {
-  if (!email) throw newError("No input email", 204);
+  if (!email) throw newError("Brak adresu email", 204);
   await User.exists({ email: email }).then((res) => {
     if (res) {
-      throw newError("Email is taken", 409);
+      throw newError("Adres email zajęty", 409);
     }
   });
 }
 
 export function validateUserToken(token) {
-  if (!token) throw newError("Invalid user token", 401);
-  const verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
-  if (!verified) throw newError("Invalid user token", 401);
+  if (!token) throw newError("Brak dostępu", 401);
+  const verified = jwt
+    .verify(token, jwtSecret, { ignoreExpiration: false })
+    .catch((e) => {
+      throw newError("Brak dostępu", 401);
+    });
+  if (!verified) throw newError("Brak dostępu", 401);
   return verified;
 }
 
 export async function validateDishId(id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw newError("Invalid ID", 400);
+    throw newError("Niewłaściwy ID", 400);
   }
   const dishDoesExist = Dish.exists({ _id: id });
-  if (!dishDoesExist) throw newError("Dish doesn't exist", 404);
+  if (!dishDoesExist) throw newError("Te danie nie istnieje w bazie.", 404);
 }
 
 export async function verifyDishAccess(dishId, decodedToken) {
-  const fetch = await User.findById(decodedToken.id, "restaurants");
+  const fetch = await User.findById(decodedToken.id, "restaurants").catch(
+    (error) => {
+      throw newError("Nie znaleziono użytkownika.", 500);
+    }
+  );
   const restaurants = fetch.restaurants;
   const restaurantId = await Dish.findById(dishId, "restaurantId").catch(
     (error) => {
-      throw newError("Couldn't fetch Dish", 404);
+      throw newError("Nie znaleziono dania.", 404);
     }
   );
   const valid = restaurants.includes(restaurantId.restaurantId);
-  if (!valid) throw newError("You don't have access to this Dish.", 401);
+  if (!valid) throw newError("Nie masz dostępu do tego dania.", 401);
+}
+
+export async function verifyRestaurantAccess(restaurantId, decodedToken) {
+  const fetch = await User.findById(decodedToken.id, "restaurants").catch(
+    (error) => {
+      throw newError("Nie znaleziono użytkownika.", 500);
+    }
+  );
+  const restaurants = fetch.restaurants;
+  const valid = restaurants.includes(restaurantId);
+  if (!valid) throw newError("Nie masz dostępu do tej restauracji.", 401);
 }
 
 export function yearFromNowDate() {
@@ -141,7 +162,7 @@ export async function hashPass(pass) {
     const hash = await bcrypt.hash(pass, salt);
     return hash;
   } catch (error) {
-    throw newError("Internal error", 500);
+    throw newError("Błąd", 500);
   }
 }
 

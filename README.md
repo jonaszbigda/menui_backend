@@ -103,7 +103,8 @@
     Takes **restaurantId** query and returns a specific restaurant **JSON** if found. Else returns **400** if restaurantId is invalid, or **404** if specified restaurantId is not found.
   - #### **POST**
     Takes a **restaurant** document, and JWT **token (header)**, tries to create new restaurant in a database, and also add it to user restaurants list. Returns **201** on success. Else returns **401** on invalid token, and **400** on general error while adding restaurant.
-  - #### **PUT** - empty!
+  - #### **PUT**
+    Takes a **restaurantId** and updates it with a supplied document.
 
   <br>
 
@@ -176,6 +177,14 @@
   - #### **GET**
 
     Takes a **string** query and returns an **array** of cities and names (cities first) matching specified query. Returns nothing if nothing found.
+
+    <br>
+
+* ### **/search/location**
+
+  - #### **GET**
+
+    Takes a **lon, lat, and radius** query parameters and returns an **array** of restaurants in a specified radius from supplied location.
 
     <br>
 

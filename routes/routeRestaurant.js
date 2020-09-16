@@ -35,10 +35,25 @@ router.post("/", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
-    const restaurant = createRestaurant(req.body);
+    const restaurant = await createRestaurant(req.body);
     await restaurant.save();
     await addRestaurantToUser(user, restaurant);
     res.sendStatus(201);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// UPDATE RESTAURANT
+
+router.put("/", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    const oldRestaurant = await fetchRestaurant(req.body.restaurantId);
+    const newRestaurant = await createRestaurant(req.body, oldRestaurant);
+    await Restaurant.replaceOne({ _id: req.body.restaurantId }, newRestaurant);
+    res.send("Dane zostały zaktualizowane.");
   } catch (error) {
     handleError(error, res);
   }

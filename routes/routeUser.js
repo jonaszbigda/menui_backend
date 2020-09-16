@@ -1,10 +1,6 @@
 import express from "express";
 import { changeUserPass, fetchUser } from "../services/databaseServices.js";
-import {
-  composeNewContact,
-  createUser,
-  prepareSafeUser,
-} from "../services/dataPrepServices.js";
+import { createUser, prepareSafeUser } from "../services/dataPrepServices.js";
 import {
   newError,
   handleError,
@@ -14,13 +10,9 @@ import {
   validateUserToken,
   hashPass,
 } from "../services/services.js";
-import * as config from "../config/index.js";
-import AgileCRMManager from "agile_crm";
 import { resetPassword } from "../services/mailServices.js";
-const { CRM_USER, CRM_EMAIL, CRM_KEY } = config;
 
 var router = express.Router();
-var agileAPI = new AgileCRMManager(CRM_USER, CRM_KEY, CRM_EMAIL);
 
 // LOGIN
 router.post("/login", async (req, res) => {
@@ -43,9 +35,9 @@ router.post("/register", async (req, res) => {
   try {
     await checkEmailTaken(req.body.email);
     const user = await createUser(req);
-    await user.save();
-    const contact = composeNewContact(user);
-    agileAPI.contactAPI.add(contact, null, null);
+    await user.save().catch((e) => {
+      throw newError("Niewłaściwe dane.", 500);
+    });
     res.sendStatus(201);
   } catch (e) {
     handleError(e, res);

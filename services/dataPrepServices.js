@@ -5,52 +5,6 @@ import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import Restaurant from "../models/restaurant.js";
 
-export function composeNewContact(request) {
-  const contact = {
-    lead_score: "100",
-    tags: ["newUser"],
-    properties: [
-      {
-        type: "SYSTEM",
-        name: "first_name",
-        value: request.firstname,
-      },
-      {
-        type: "SYSTEM",
-        name: "last_name",
-        value: request.lastname,
-      },
-      {
-        type: "SYSTEM",
-        name: "email",
-        subtype: "work",
-        value: request.email,
-      },
-      {
-        type: "CUSTOM",
-        name: "UserID",
-        value: request._id,
-      },
-      {
-        type: "CUSTOM",
-        name: "NIP",
-        value: request.NIP,
-      },
-      {
-        type: "CUSTOM",
-        name: "CompanyName",
-        value: request.companyName,
-      },
-      {
-        type: "CUSTOM",
-        name: "CompanyAdress",
-        value: request.adress,
-      },
-    ],
-  };
-  return contact;
-}
-
 export async function createUser(request) {
   const password = await hashPass(request.body.password);
   const user = new User({
@@ -68,25 +22,68 @@ export async function createUser(request) {
   return user;
 }
 
-export function createRestaurant(request) {
+async function handleImageUpdate(request, previous) {
+  if (!previous) {
+    if (!request.imgURL) {
+      return "empty";
+    } else {
+      const img = await saveImage(request.imgURL);
+      return img;
+    }
+  } else {
+    if (request.imgURL == previous.imgUrl) {
+      return previous.imgUrl;
+    } else {
+      if (!request.imgURL) {
+        return previous.imgUrl;
+      } else {
+        const img = await saveImage(request.imgURL);
+        return img;
+      }
+    }
+  }
+}
+
+export async function createRestaurant(request, oldRestaurant) {
   try {
-    const restaurant = new Restaurant({
-      _id: new mongoose.Types.ObjectId(),
-      name: sanitizer.sanitize.keepUnicode(request.name),
-      city: sanitizer.sanitize.keepUnicode(request.city),
-      adress: sanitizer.sanitize.keepUnicode(request.adress),
-      location: request.location,
-      imgUrl: saveImage(request.imgURL),
-      workingHours: request.workingHours,
-      description: sanitizer.sanitize.keepUnicode(request.description),
-      tags: request.tags,
-      links: request.links,
-      phone: request.phone,
-      hidden: request.hidden,
-    });
-    return restaurant;
+    if (!oldRestaurant) {
+      const img = await handleImageUpdate(request);
+      const restaurant = new Restaurant({
+        _id: new mongoose.Types.ObjectId(),
+        name: sanitizer.sanitize.keepUnicode(request.name),
+        city: sanitizer.sanitize.keepUnicode(request.city),
+        adress: sanitizer.sanitize.keepUnicode(request.adress),
+        location: request.location,
+        imgUrl: img,
+        workingHours: request.workingHours,
+        description: sanitizer.sanitize.keepUnicode(request.description),
+        tags: request.tags,
+        links: request.links,
+        phone: request.phone,
+        hidden: request.hidden,
+      });
+      return restaurant;
+    } else {
+      const img = await handleImageUpdate(request, oldRestaurant);
+      const restaurant = new Restaurant({
+        name: sanitizer.sanitize.keepUnicode(request.name),
+        city: sanitizer.sanitize.keepUnicode(request.city),
+        dishes: oldRestaurant.dishes,
+        adress: sanitizer.sanitize.keepUnicode(request.adress),
+        location: request.location,
+        imgUrl: img,
+        workingHours: request.workingHours,
+        description: sanitizer.sanitize.keepUnicode(request.description),
+        tags: request.tags,
+        links: request.links,
+        phone: request.phone,
+        hidden: request.hidden,
+      });
+      return restaurant;
+    }
   } catch (error) {
-    throw newError("Invalid input data", 206);
+    console.log(error);
+    throw newError("Niewłaściwe dane", 206);
   }
 }
 

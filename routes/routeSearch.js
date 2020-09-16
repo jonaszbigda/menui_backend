@@ -1,8 +1,7 @@
 import express from "express";
-import * as services from "../services/services.js";
 import Restaurant from "../models/restaurant.js";
 import sanitizer from "string-sanitizer";
-import restaurant from "../models/restaurant.js";
+import { handleError } from "../services/services.js";
 
 var router = express.Router();
 
@@ -18,9 +17,10 @@ router.get("/", (req, res) => {
         $and: [
           { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
           { hidden: false },
+          { subscriptionActive: true },
         ],
       },
-      "_id name city imgUrl workingHours description tags phone hidden",
+      "_id name city imgUrl workingHours description tags location links",
       (err, results) => {
         if (err) {
           res.sendStatus(500);
@@ -33,6 +33,24 @@ router.get("/", (req, res) => {
     res.send({
       results: [],
     });
+  }
+});
+
+// SEARCH RESTAURANTS BY LOCATION
+
+router.get("/location", async (req, res) => {
+  try {
+    const location = {
+      coordinates: [req.query.lon, req.query.lat],
+      type: "Point",
+    };
+    const radius = parseInt(req.query.radius) * 1000;
+    const results = await Restaurant.find({
+      location: { $near: { $maxDistance: radius, $geometry: location } },
+    });
+    res.send(results);
+  } catch (error) {
+    handleError(error, res);
   }
 });
 

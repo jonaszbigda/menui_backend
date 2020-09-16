@@ -88,13 +88,13 @@ export async function checkEmailTaken(email) {
 
 export function validateUserToken(token) {
   if (!token) throw newError("Brak dostępu", 401);
-  const verified = jwt
-    .verify(token, jwtSecret, { ignoreExpiration: false })
-    .catch((e) => {
-      throw newError("Brak dostępu", 401);
-    });
-  if (!verified) throw newError("Brak dostępu", 401);
-  return verified;
+  try {
+    const verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
+    if (!verified) throw newError("Brak dostępu", 401);
+    return verified;
+  } catch (error) {
+    throw newError("Brak dostępu", 401);
+  }
 }
 
 export async function validateDishId(id) {
@@ -142,17 +142,6 @@ export function yearFromNowDate() {
   return date.addDays(365);
 }
 
-export function halfYearFromNowDate() {
-  Date.prototype.addDays = function (days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
-  };
-  var nowDate = new Date();
-  var resultDate = nowDate.addDays(183);
-  return toShortDate(resultDate);
-}
-
 export async function hashPass(pass) {
   if (pass.length < 6) {
     throw newError("Hasło za krótkie.", 500);
@@ -164,21 +153,6 @@ export async function hashPass(pass) {
   } catch (error) {
     throw newError("Błąd", 500);
   }
-}
-
-export function dueDateBasedOnSubscription(subscriptionActive) {
-  if (subscriptionActive === true) {
-    return halfYearFromNowDate();
-  } else {
-    return new Date();
-  }
-}
-
-export function toShortDate(date) {
-  if (!date) return false;
-  const shortDate =
-    date.getMonth() + "/" + date.getDay() + "/" + date.getFullYear();
-  return shortDate;
 }
 
 export async function saveImage(url) {

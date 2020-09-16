@@ -13,23 +13,28 @@ const userSchema = mongoose.Schema({
   firstname: {
     type: String,
     required: true,
+    maxlength: 64,
   },
   lastname: {
     type: String,
     required: true,
+    maxlength: 64,
   },
   billing: {
     NIP: {
       type: String,
       required: true,
+      maxlength: 64,
     },
     adress: {
       type: String,
       required: true,
+      maxlength: 128,
     },
     companyName: {
       type: String,
       required: true,
+      maxlength: 64,
     },
   },
   restaurants: [mongoose.Types.ObjectId],

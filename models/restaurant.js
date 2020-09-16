@@ -30,7 +30,6 @@ const restaurantSchema = mongoose.Schema({
   },
   imgUrl: {
     type: String,
-    required: true,
   },
   workingHours: {
     type: String,
@@ -57,8 +56,8 @@ const restaurantSchema = mongoose.Schema({
   phone: Number,
   hidden: Boolean,
   subscriptionActive: Boolean,
-  subscriptionStarted: String,
-  subscriptionDue: String,
+  subscriptionStarted: Date,
+  subscriptionDue: Date,
   dishes: [mongoose.Types.ObjectId],
 });
 

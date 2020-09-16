@@ -1,14 +1,16 @@
 import express from "express";
 import * as services from "../services/services.js";
+import * as databaseServices from "../services/databaseServices.js";
 
 var router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const decodedToken = services.validateUserToken(
-      req.headers["x-auth-token"]
+    const newDate = await databaseServices.renewSubscription(
+      req.body.restaurantId,
+      1
     );
-    res.send(decodedToken);
+    res.send(`Subskrypcja przedłużona do: ${newDate}`);
   } catch (error) {
     services.handleError(error, res);
   }

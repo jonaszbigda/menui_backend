@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
       {
         $and: [
           { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
-          { hidden: false },
+          { $or: [{ hidden: false }, { hidden: { $exists: false } }] },
           { subscriptionActive: true },
         ],
       },

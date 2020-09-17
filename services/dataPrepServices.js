@@ -53,7 +53,10 @@ export async function createRestaurant(request, oldRestaurant) {
         name: sanitizer.sanitize.keepUnicode(request.name),
         city: sanitizer.sanitize.keepUnicode(request.city),
         adress: sanitizer.sanitize.keepUnicode(request.adress),
-        location: request.location,
+        location: {
+          type: "Point",
+          coordinates: request.coordinates,
+        },
         imgUrl: img,
         workingHours: request.workingHours,
         description: sanitizer.sanitize.keepUnicode(request.description),
@@ -70,7 +73,10 @@ export async function createRestaurant(request, oldRestaurant) {
         city: sanitizer.sanitize.keepUnicode(request.city),
         dishes: oldRestaurant.dishes,
         adress: sanitizer.sanitize.keepUnicode(request.adress),
-        location: request.location,
+        location: {
+          type: "Point",
+          coordinates: request.coordinates,
+        },
         imgUrl: img,
         workingHours: request.workingHours,
         description: sanitizer.sanitize.keepUnicode(request.description),

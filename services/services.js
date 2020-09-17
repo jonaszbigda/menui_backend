@@ -66,14 +66,14 @@ function generatePasswordResetToken(email) {
       email: email,
     },
     jwtSecret,
-    { expiresIn: "15m" }
+    { expiresIn: "30m" }
   );
   return token;
 }
 
 export function generatePasswordResetLink(email) {
   const token = generatePasswordResetToken(email);
-  const link = `https://www.menui.pl/forgot?token=${token}`;
+  const link = `localhost:3000/resetpassword?token=${token}`;
   return link;
 }
 

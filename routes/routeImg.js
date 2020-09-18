@@ -15,7 +15,7 @@ const uploadStrategy = multer({
     cb(null, true);
   },
   limits: { fileSize: 4000000 },
-}).single("image");
+}).single("menuiImage");
 
 // POST
 

@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import Restaurant from "../models/restaurant.js";
+import { fetchMultipleRestaurants } from "./databaseServices.js";
 
 export async function createUser(request) {
   const password = await hashPass(request.body.password);
@@ -62,7 +63,11 @@ export async function createRestaurant(request, oldRestaurant) {
         workingHours: request.workingHours,
         description: sanitizer.sanitize.keepUnicode(request.description),
         tags: request.tags,
-        links: request.links,
+        links: {
+          facebook: request.facebook,
+          instagram: request.instagram,
+          www: request.www,
+        },
         phone: request.phone,
         hidden: request.hidden,
       });
@@ -95,13 +100,17 @@ export async function createRestaurant(request, oldRestaurant) {
   }
 }
 
-export function prepareSafeUser(user) {
+export async function prepareSafeUser(user) {
+  const restaurants = await fetchMultipleRestaurants(user.restaurants);
   const safeUser = {
     firstname: user.firstname,
     lastname: user.lastname,
     email: user.email,
     id: user._id,
-    restaurants: user.restaurants,
+    restaurants: restaurants,
+    NIP: user.billing.NIP,
+    adress: user.billing.adress,
+    companyName: user.billing.companyName,
   };
   return safeUser;
 }
@@ -129,6 +138,8 @@ export async function createDish(dish, restaurantId, generateId) {
           sesame: dish.allergens.sesame,
         },
         ingredients: dish.ingredients,
+        glicemicIndex: dish.glicemicIndex,
+        kCal: dish.kCal,
         vegan: dish.vegan,
         vegetarian: dish.vegetarian,
       });
@@ -152,6 +163,8 @@ export async function createDish(dish, restaurantId, generateId) {
           sesame: dish.allergens.sesame,
         },
         ingredients: dish.ingredients,
+        glicemicIndex: dish.glicemicIndex,
+        kCal: dish.kCal,
         vegan: dish.vegan,
         vegetarian: dish.vegetarian,
       });

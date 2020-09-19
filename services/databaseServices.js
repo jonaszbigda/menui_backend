@@ -105,12 +105,18 @@ export async function renewSubscription(restaurantId, monthsToAdd) {
 }
 
 export async function fetchRestaurant(id) {
-  let data;
-  await Restaurant.findById(id, (err, result) => {
-    data = result;
-  }).catch((e) => {
+  const data = await Restaurant.findById(id).catch((e) => {
     throw newError("Nie udało się pobrać restauracji.", 500);
   });
+  return data;
+}
+
+export async function fetchMultipleRestaurants(idArray) {
+  let data = [];
+  for (const id of idArray) {
+    let response = await fetchRestaurant(id);
+    data.push(response);
+  }
   return data;
 }
 

@@ -39,6 +39,8 @@ const dishSchema = mongoose.Schema({
   ingredients: {
     type: [String],
   },
+  glicemicIndex: String,
+  kCal: String,
   vegan: Boolean,
   vegetarian: Boolean,
 });

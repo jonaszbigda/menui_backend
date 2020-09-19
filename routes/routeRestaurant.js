@@ -12,6 +12,7 @@ import {
   handleError,
   validateUserToken,
   verifyRestaurantAccess,
+  newError,
 } from "../services/services.js";
 import Restaurant from "../models/restaurant.js";
 
@@ -35,7 +36,9 @@ router.post("/", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
-    const restaurant = await createRestaurant(req.body);
+    const restaurant = await createRestaurant(req.body).catch((err) => {
+      throw newError("Nie udało się zapisać zdjęcia.", 500);
+    });
     await restaurant.save();
     await addRestaurantToUser(user, restaurant);
     res.sendStatus(201);

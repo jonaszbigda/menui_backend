@@ -22,7 +22,7 @@ router.post("/login", async (req, res) => {
     }
     const user = await fetchUser(req.body.email);
     await checkPassword(req.body.password, user.password);
-    const safeUser = prepareSafeUser(user);
+    const safeUser = await prepareSafeUser(user);
     var token = generateAuthToken(safeUser);
     res.header("x-auth-token", token).status(202).send(safeUser);
   } catch (error) {

@@ -50,11 +50,10 @@ const restaurantSchema = mongoose.Schema({
   },
   links: {
     facebook: String,
-    twitter: String,
     instagram: String,
     www: String,
   },
-  phone: Number,
+  phone: String,
   hidden: Boolean,
   subscriptionActive: Boolean,
   subscriptionStarted: Date,

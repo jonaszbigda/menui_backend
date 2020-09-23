@@ -33,8 +33,13 @@ const restaurantSchema = mongoose.Schema({
     type: String,
   },
   workingHours: {
-    type: String,
-    required: true,
+    pn: String,
+    wt: String,
+    sr: String,
+    cz: String,
+    pt: String,
+    sb: String,
+    nd: String,
   },
   description: {
     type: String,
@@ -58,6 +63,8 @@ const restaurantSchema = mongoose.Schema({
   subscriptionActive: Boolean,
   subscriptionStarted: Date,
   subscriptionDue: Date,
+  categories: [String],
+  lunchMenu: [mongoose.Types.ObjectId],
   dishes: [mongoose.Types.ObjectId],
 });
 

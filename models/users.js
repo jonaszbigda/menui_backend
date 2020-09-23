@@ -38,6 +38,7 @@ const userSchema = mongoose.Schema({
     },
   },
   restaurants: [mongoose.Types.ObjectId],
+  trialUsed: Boolean,
 });
 
 export default mongoose.model("User", userSchema);

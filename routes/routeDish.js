@@ -3,8 +3,15 @@ import { createDish } from "../services/dataPrepServices.js";
 import {
   removeDish,
   addDishToRestaurant,
+  setDishVisibility,
 } from "../services/databaseServices.js";
-import * as services from "../services/services.js";
+import {
+  validateRestaurant,
+  validateUserToken,
+  validateDishId,
+  handleError,
+  verifyDishAccess,
+} from "../services/services.js";
 import Dish from "../models/dish.js";
 
 var router = express.Router();
@@ -23,15 +30,29 @@ router.get("/", (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    await services.validateRestaurant(req.body.restaurantId);
+    await validateRestaurant(req.body.restaurantId);
     const token = req.headers["x-auth-token"];
-    services.validateUserToken(token);
+    validateUserToken(token);
     const dish = createDish(req.body.dish, req.body.restaurantId, true);
     await dish.save();
     await addDishToRestaurant(req.body.restaurantId, dish._id);
     res.status(201).send(dish._id);
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
+  }
+});
+
+// HIDE, UNHIDE DISH
+
+router.post("/hidden", async (req, res) => {
+  try {
+    await validateDishId(req.body.dishId);
+    const token = req.headers["x-auth-token"];
+    validateUserToken(token);
+    await setDishVisibility(req.body.dishId, req.body.visible);
+    res.sendStatus(200);
+  } catch (error) {
+    handleError(error, res);
   }
 });
 
@@ -39,14 +60,14 @@ router.post("/", async (req, res) => {
 
 router.delete("/", async (req, res) => {
   try {
-    await services.validateDishId(req.body.dishId);
+    await validateDishId(req.body.dishId);
     const token = req.headers["x-auth-token"];
-    const decodedToken = services.validateUserToken(token);
-    await services.verifyDishAccess(req.body.dishId, decodedToken);
+    const decodedToken = validateUserToken(token);
+    await verifyDishAccess(req.body.dishId, decodedToken);
     await removeDish(req.body.dishId);
     res.sendStatus(200);
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
   }
 });
 
@@ -54,14 +75,14 @@ router.delete("/", async (req, res) => {
 
 router.put("/", async (req, res) => {
   try {
-    await services.validateDishId(req.body.dishId);
+    await validateDishId(req.body.dishId);
     const token = req.headers["x-auth-token"];
-    services.validateUserToken(token);
+    validateUserToken(token);
     const dish = createDish(req.body.dish, req.body.restaurantId, false);
     await Dish.replaceOne({ _id: req.body.dishId }, dish);
     res.sendStatus(200);
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
   }
 });
 

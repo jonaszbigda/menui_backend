@@ -104,6 +104,72 @@ export async function renewSubscription(restaurantId, monthsToAdd) {
   return dueDateBasedOnSubscription(restaurant, monthsToAdd);
 }
 
+async function checkIfCategoryExists(restaurant, category) {
+  const categories = restaurant.categories;
+  if (categories.includes(category)) {
+    throw newError("Podana kategoria już istnieje", 200);
+  }
+}
+
+async function checkIfAlreadyInLunchMenu(restaurant, dishId) {
+  const lunchMenu = restaurant.lunchMenu;
+  if (lunchMenu.includes(dishId)) {
+    throw newError("Podane danie jest już w lunch menu", 200);
+  }
+}
+
+export async function changeCategory(restaurantId, categoryName, action) {
+  if (action === "add") {
+    const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
+      throw newError("Nie udało się pobrać restauracji.", 404);
+    });
+    await checkIfCategoryExists(restaurant, categoryName);
+    await Restaurant.findByIdAndUpdate(restaurantId, {
+      $push: { categories: categoryName },
+    }).catch((e) => {
+      throw newError("Nie udało się dodać kategorii.", 500);
+    });
+  } else if (action === "delete") {
+    await Restaurant.findByIdAndUpdate(restaurantId, {
+      $pull: { categories: categoryName },
+    }).catch((e) => {
+      throw newError("Nie udało się usunąć kategorii.", 500);
+    });
+  } else {
+    throw newError("Nieznany błąd.", 500);
+  }
+}
+
+export async function setDishVisibility(dishId, visible) {
+  await Dish.findByIdAndUpdate(dishId, { $set: { hidden: !visible } }).catch(
+    (e) => {
+      throw newError("Nie udało się zmienić dania.", 500);
+    }
+  );
+}
+
+export async function changeLunchMenu(restaurantId, dishId, action) {
+  if (action === "add") {
+    const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
+      throw newError("Nie udało się pobrać restauracji.", 404);
+    });
+    await checkIfAlreadyInLunchMenu(restaurant, dishId);
+    await Restaurant.findByIdAndUpdate(restaurantId, {
+      $push: { lunchMenu: dishId },
+    }).catch((e) => {
+      throw newError("Nie udało się dodać dania do lunch menu.", 500);
+    });
+  } else if (action === "delete") {
+    await Restaurant.findByIdAndUpdate(restaurantId, {
+      $pull: { lunchMenu: dishId },
+    }).catch((e) => {
+      throw newError("Nie udało się usunąć dania.", 500);
+    });
+  } else {
+    throw newError("Nie sprecyzowano akcji", 500);
+  }
+}
+
 export async function fetchRestaurant(id) {
   const data = await Restaurant.findById(id).catch((e) => {
     throw newError("Nie udało się pobrać restauracji.", 500);

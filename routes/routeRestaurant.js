@@ -5,6 +5,8 @@ import {
   fetchRestaurant,
   fetchAllDishesForRestaurant,
   removeRestaurant,
+  changeCategory,
+  changeLunchMenu,
 } from "../services/databaseServices.js";
 import {
   decodeAndSanitize,
@@ -71,6 +73,44 @@ router.get("/dishes", async (req, res) => {
     let restaurant = await fetchRestaurant(query);
     let dishes = await fetchAllDishesForRestaurant(restaurant);
     res.send(dishes);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// CHANGE CATEGORY
+
+router.post("/category", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    await validateRestaurant(req.body.restaurantId);
+    await verifyRestaurantAccess(req.body.restaurantId, user);
+    await changeCategory(
+      req.body.restaurantId,
+      req.body.category,
+      req.body.action
+    );
+    res.send("Kategoria zmieniona pomyślnie");
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// CHANGE LUNCH MENU
+
+router.post("/lunch", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    await validateRestaurant(req.body.restaurantId);
+    await verifyRestaurantAccess(req.body.restaurantId, user);
+    await changeLunchMenu(
+      req.body.restaurantId,
+      req.body.dishId,
+      req.body.action
+    );
+    res.send("Lunch menu zmienione pomyślnie.");
   } catch (error) {
     handleError(error, res);
   }

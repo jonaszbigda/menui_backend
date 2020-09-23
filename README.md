@@ -19,8 +19,16 @@
   - ##### **location**
     - ##### **type**: _String_ (enum: ["Point"], required)
     - ##### **coordinates**: [Number] required
+  - ##### **placesId**: _String_
   - ##### **imgUrl**: _String_ (required)
-  - ##### **workingHours**: _String_ (required)
+  - ##### **workingHours**:
+    - ##### **pn**: String
+    - ##### **wt**: String
+    - ##### **sr**: String
+    - ##### **cz**: String
+    - ##### **pt**: String
+    - ##### **sb**: String
+    - ##### **nd**: String
   - ##### **description**: _String_
   - ##### **tags**
     - ##### **cardPayments**: _Boolean_
@@ -32,7 +40,6 @@
     - ##### **delivery**: _Boolean_
   - ##### **links**
     - ##### **facebook**: _String_
-    - ##### **twitter**: _String_
     - ##### **instagram**: _String_
     - ##### **www**: _String_
   - ##### **phone**: _Number_
@@ -40,6 +47,8 @@
   - ##### **subscriptionActive**: _Boolean_
   - ##### **subscriptionStarted**: _String_
   - ##### **subscriptionDue**: _String_
+  - ##### **categories**: [String]
+  - ##### **lunchMenu**: [*mongoose.Types.ObjectId*]
   - ##### **dishes**: [*mongoose.Types.ObjectId*]
   <br>
 
@@ -63,6 +72,8 @@
     - ##### **peanuts**: _Boolean_
     - ##### **sesame**: _Boolean_
   - ##### **ingredients**: [*String*]
+  - ##### **glicemicIndex**: String
+  - ##### **kCal**: String
   - ##### **vegan**: _Boolean_
   - ##### **vegetarian**: _Boolean_
   <br>
@@ -94,8 +105,17 @@
   - #### **PUT**
     Takes in **dishId**, **restaurantId**, **dish** document, and a JWT **token (header)** and tries to update specified document in a database. Returns **304** on success. Else returns **204** on bad document, or **401** on bad token.
   - #### **DELETE**
+
     Takes in **dishId**, and JWT **token (header)** and tries to remove specified dish from database. If everything goes OK, it returns **200**.
+
     <br>
+
+* ### **/dish/hidden**
+
+  - #### **POST**
+    Takes a **dishId, visible(bool)** parameters, and JWT **token (header)**, tries to set dish visibility. Returns **200** on success.
+
+  <br>
 
 * ### **/restaurant**
 
@@ -105,6 +125,20 @@
     Takes a **restaurant** document, and JWT **token (header)**, tries to create new restaurant in a database, and also add it to user restaurants list. Returns **201** on success. Else returns **401** on invalid token, and **400** on general error while adding restaurant.
   - #### **PUT**
     Takes a **restaurantId** and updates it with a supplied document.
+
+  <br>
+
+  - ### **/restaurant/category**
+
+  * #### **POST**
+    Takes a **restaurantId, category, action (add / delete)** parameters, and JWT **token (header)**, tries to create or remove a supplied category.
+
+  <br>
+
+  - ### **/restaurant/lunch**
+
+  * #### **POST**
+    Takes a **restaurantId, dishId, action (add / delete)** parameters, and JWT **token (header)**, tries to create or remove a supplied dish from/to the lunch menu.
 
   <br>
 
@@ -120,7 +154,7 @@
 
   - #### **POST**
 
-    Takes a **restaurantId** parameter and a **JWT token(header)**, and tries to remove the restaurant from the database and from user. If successfull returns **200**, if failed returns error with a code.
+    Takes a **restaurantId** parameter **!!!should also check password!!!** and a **JWT token(header)**, and tries to remove the restaurant from the database and from user. If successfull returns **200**, if failed returns error with a code.
 
     <br>
 
@@ -161,6 +195,14 @@
   - #### **POST**
 
     Takes **token, email, newPass** parameters and if everything checks out, changes user password to the supplied **newPass**.
+
+    <br>
+
+* ### **/user/changepass**
+
+  - #### **POST**
+
+    Takes **token, email, newPass, pass** parameters and if everything checks out, changes user password to the supplied **newPass**.
 
     <br>
 

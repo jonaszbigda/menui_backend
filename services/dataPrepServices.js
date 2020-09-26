@@ -63,11 +63,7 @@ export async function createRestaurant(request, oldRestaurant) {
         workingHours: request.workingHours,
         description: sanitizer.sanitize.keepUnicode(request.description),
         tags: request.tags,
-        links: {
-          facebook: request.facebook,
-          instagram: request.instagram,
-          www: request.www,
-        },
+        links: request.links,
         phone: request.phone,
         hidden: request.hidden,
       });

@@ -1,6 +1,7 @@
 import Restaurant from "../models/restaurant.js";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
+import { deleteImage } from "./azureServices.js";
 import { newError } from "./services.js";
 
 export async function changeUserPass(userId, newPass) {
@@ -26,6 +27,13 @@ export async function removeRestaurant(restaurantId, userId) {
       throw newError("Usunięcie nie powiodło się.", 500);
     }
   );
+  await deleteImage(deletedDoc.imgUrl);
+  for (dishId of deletedDoc.dishes) {
+    const deletedDish = await Dish.findByIdAndDelete(dishId).catch((e) =>
+      console.log(e)
+    );
+    await deleteImage(deletedDish.imgUrl);
+  }
   await User.findByIdAndUpdate(userId, {
     $pull: { restaurants: restaurantId },
   }).catch((e) => {

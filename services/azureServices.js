@@ -75,3 +75,12 @@ export function setDeleteTempBlobTimer(blobName, containerClient, minutes) {
     blob.delete();
   }, 1000 * 60 * minutes);
 }
+
+export async function deleteImage(url) {
+  const containerClient = blobServiceClient.getContainerClient(container);
+  const containerUrl = containerClient.url + "/";
+  const blobName = url.replace(containerUrl, "");
+  console.log(`BLOB NAME = ${blobName}`);
+  const blob = containerClient.getBlobClient(blobName);
+  await blob.delete();
+}

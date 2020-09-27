@@ -7,6 +7,7 @@ import {
   removeRestaurant,
   changeCategory,
   changeLunchMenu,
+  fetchUser,
 } from "../services/databaseServices.js";
 import {
   decodeAndSanitize,
@@ -15,6 +16,7 @@ import {
   validateUserToken,
   verifyRestaurantAccess,
   newError,
+  checkPassword,
 } from "../services/services.js";
 import Restaurant from "../models/restaurant.js";
 
@@ -58,7 +60,7 @@ router.put("/", async (req, res) => {
     const oldRestaurant = await fetchRestaurant(req.body.restaurantId);
     const newRestaurant = await createRestaurant(req.body, oldRestaurant);
     await Restaurant.replaceOne({ _id: req.body.restaurantId }, newRestaurant);
-    res.send("Dane zostały zaktualizowane.");
+    res.send(newRestaurant);
   } catch (error) {
     handleError(error, res);
   }
@@ -91,7 +93,8 @@ router.post("/category", async (req, res) => {
       req.body.category,
       req.body.action
     );
-    res.send("Kategoria zmieniona pomyślnie");
+    const restaurant = await fetchRestaurant(req.body.restaurantId);
+    res.send(restaurant);
   } catch (error) {
     handleError(error, res);
   }
@@ -110,7 +113,8 @@ router.post("/lunch", async (req, res) => {
       req.body.dishId,
       req.body.action
     );
-    res.send("Lunch menu zmienione pomyślnie.");
+    const restaurant = await fetchRestaurant(req.body.restaurantId);
+    res.send(restaurant);
   } catch (error) {
     handleError(error, res);
   }
@@ -120,11 +124,16 @@ router.post("/lunch", async (req, res) => {
 
 router.post("/delete", async (req, res) => {
   try {
+    if (!req.body.password) {
+      throw newError("Niepełne dane.", 204);
+    }
     const token = req.headers["x-auth-token"];
-    const user = validateUserToken(token);
+    validateUserToken(token);
+    const user = await fetchUser(req.body.email);
+    await checkPassword(req.body.password, user.password);
     await validateRestaurant(req.body.restaurantId);
     await verifyRestaurantAccess(req.body.restaurantId, user);
-    await removeRestaurant(req.body.restaurantId, user.id);
+    await removeRestaurant(req.body.restaurantId, user._id);
     res.send("Restauracja została pomyślnie usunięta.");
   } catch (error) {
     handleError(error, res);

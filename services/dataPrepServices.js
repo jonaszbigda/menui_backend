@@ -5,6 +5,7 @@ import Dish from "../models/dish.js";
 import User from "../models/users.js";
 import Restaurant from "../models/restaurant.js";
 import { fetchMultipleRestaurants } from "./databaseServices.js";
+import { deleteImage } from "./azureServices.js";
 
 export async function createUser(request) {
   const password = await hashPass(request.body.password);
@@ -25,20 +26,21 @@ export async function createUser(request) {
 
 async function handleImageUpdate(request, previous) {
   if (!previous) {
-    if (!request.imgURL) {
+    if (!request.imgUrl) {
       return "empty";
     } else {
-      const img = await saveImage(request.imgURL);
+      const img = await saveImage(request.imgUrl);
       return img;
     }
   } else {
-    if (request.imgURL == previous.imgUrl) {
+    if (request.imgUrl == previous.imgUrl) {
       return previous.imgUrl;
     } else {
-      if (!request.imgURL) {
+      if (!request.imgUrl) {
         return previous.imgUrl;
       } else {
-        const img = await saveImage(request.imgURL);
+        const img = await saveImage(request.imgUrl);
+        await deleteImage(previous.imgUrl);
         return img;
       }
     }

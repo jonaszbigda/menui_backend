@@ -30,6 +30,19 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// REFRESH
+router.post("/refresh", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    const freshUser = await fetchUser(user.email);
+    const safeUser = await prepareSafeUser(freshUser);
+    res.send(safeUser);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
 // REGISTER
 router.post("/register", async (req, res) => {
   try {

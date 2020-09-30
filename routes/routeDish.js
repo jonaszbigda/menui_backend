@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
     await validateRestaurant(req.body.restaurantId);
     const token = req.headers["x-auth-token"];
     validateUserToken(token);
-    const dish = createDish(req.body.dish, req.body.restaurantId, true);
+    const dish = await createDish(req.body, req.body.restaurantId, true);
     await dish.save();
     await addDishToRestaurant(req.body.restaurantId, dish._id);
     res.status(201).send(dish._id);

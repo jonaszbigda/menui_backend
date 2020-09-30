@@ -116,7 +116,7 @@ export async function prepareSafeUser(user) {
 export async function createDish(dish, restaurantId, generateId) {
   try {
     if (generateId) {
-      const img = await saveImage(dish.imgUrl);
+      const img = await handleImageUpdate(dish);
       const newDish = new Dish({
         _id: new mongoose.Types.ObjectId(),
         restaurantId: restaurantId,
@@ -143,13 +143,14 @@ export async function createDish(dish, restaurantId, generateId) {
       });
       return newDish;
     } else {
+      const img = "";
       const newDish = new Dish({
         restaurantId: restaurantId,
         name: sanitizer.sanitize.keepUnicode(dish.name),
         category: dish.category,
         price: dish.price,
         notes: sanitizer.sanitize.keepUnicode(dish.notes),
-        imgUrl: dish.imgUrl,
+        imgUrl: img,
         weight: dish.weight,
         allergens: {
           gluten: dish.allergens.gluten,
@@ -169,6 +170,7 @@ export async function createDish(dish, restaurantId, generateId) {
       return newDish;
     }
   } catch (e) {
+    console.log(e);
     throw newError("Cannot create dish", 500);
   }
 }

@@ -64,7 +64,14 @@ const restaurantSchema = mongoose.Schema({
   subscriptionStarted: Date,
   subscriptionDue: Date,
   categories: [String],
-  lunchMenu: [mongoose.Types.ObjectId],
+  lunchHours: String,
+  lunchMenu: [
+    {
+      lunchSetName: String,
+      lunchSetPrice: String,
+      lunchSetDishes: [mongoose.Types.ObjectId],
+    },
+  ],
   dishes: [mongoose.Types.ObjectId],
 });
 

@@ -14,19 +14,19 @@ const dishSchema = mongoose.Schema({
     required: true,
   },
   price: {
-    type: Number,
+    type: String,
     required: true,
   },
   notes: {
     type: String,
-    maxlength: 128,
+    maxlength: 200,
   },
   imgUrl: {
     type: String,
     required: true,
   },
   hidden: Boolean,
-  weight: Number,
+  weight: String,
   allergens: {
     gluten: Boolean,
     lactose: Boolean,
@@ -36,9 +36,7 @@ const dishSchema = mongoose.Schema({
     peanuts: Boolean,
     sesame: Boolean,
   },
-  ingredients: {
-    type: [String],
-  },
+  ingredients: String,
   glicemicIndex: String,
   kCal: String,
   vegan: Boolean,

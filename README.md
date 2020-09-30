@@ -48,9 +48,15 @@
   - ##### **subscriptionStarted**: _String_
   - ##### **subscriptionDue**: _String_
   - ##### **categories**: [String]
-  - ##### **lunchMenu**: [*mongoose.Types.ObjectId*]
-  - ##### **dishes**: [*mongoose.Types.ObjectId*]
-  <br>
+
+- ##### **lunchHours**: String
+- ##### **lunchMenu**:
+  - ##### **lunchSetName**: _String_
+  - ##### **lunchSetPrice**: _String_
+  - ##### **lunchSetDishes**: [mongoose.Types.ObjectId]
+- ##### **dishes**: [*mongoose.Types.ObjectId*]
+
+<br>
 
 - ### **Dish**
 
@@ -58,11 +64,11 @@
   - ##### **restaurantId**: _mongoose.Types.ObjectId_
   - ##### **name**: _String_ (max: 128, required)
   - ##### **category**: _String_ (max: 64, required)
-  - ##### **price**: _Number_ (required)
+  - ##### **price**: String (required)
   - ##### **notes**: _String_ (max: 128)
   - ##### **imgUrl**: _String_ (required)
   - ##### **hidden**: _Boolean_
-  - ##### **weight**: _Number_
+  - ##### **weight**: String
   - ##### **allergens**
     - ##### **gluten**: _Boolean_
     - ##### **lactose**: _Boolean_
@@ -71,7 +77,7 @@
     - ##### **seaFood**: _Boolean_
     - ##### **peanuts**: _Boolean_
     - ##### **sesame**: _Boolean_
-  - ##### **ingredients**: [*String*]
+  - ##### **ingredients**: String
   - ##### **glicemicIndex**: String
   - ##### **kCal**: String
   - ##### **vegan**: _Boolean_

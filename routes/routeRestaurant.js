@@ -59,6 +59,7 @@ router.put("/", async (req, res) => {
     const user = validateUserToken(token);
     const oldRestaurant = await fetchRestaurant(req.body.restaurantId);
     const newRestaurant = await createRestaurant(req.body, oldRestaurant);
+    await verifyRestaurantAccess(req.body.restaurantId, user);
     await Restaurant.replaceOne({ _id: req.body.restaurantId }, newRestaurant);
     res.send(newRestaurant);
   } catch (error) {

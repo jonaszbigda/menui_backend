@@ -113,9 +113,9 @@ export async function prepareSafeUser(user) {
   return safeUser;
 }
 
-export async function createDish(dish, restaurantId, generateId) {
+export async function createDish(dish, restaurantId, oldDish) {
   try {
-    if (generateId) {
+    if (!oldDish) {
       const img = await handleImageUpdate(dish);
       const newDish = new Dish({
         _id: new mongoose.Types.ObjectId(),
@@ -126,15 +126,7 @@ export async function createDish(dish, restaurantId, generateId) {
         notes: sanitizer.sanitize.keepUnicode(dish.notes),
         imgUrl: img,
         weight: dish.weight,
-        allergens: {
-          gluten: dish.allergens.gluten,
-          lactose: dish.allergens.lactose,
-          soy: dish.allergens.soy,
-          eggs: dish.allergens.eggs,
-          seaFood: dish.allergens.seaFood,
-          peanuts: dish.allergens.peanuts,
-          sesame: dish.allergens.sesame,
-        },
+        allergens: dish.allergens,
         ingredients: dish.ingredients,
         glicemicIndex: dish.glicemicIndex,
         kCal: dish.kCal,
@@ -143,24 +135,16 @@ export async function createDish(dish, restaurantId, generateId) {
       });
       return newDish;
     } else {
-      const img = "";
+      const img = await handleImageUpdate(dish, oldDish);
       const newDish = new Dish({
-        restaurantId: restaurantId,
+        restaurantId: oldDish.restaurantId,
         name: sanitizer.sanitize.keepUnicode(dish.name),
         category: dish.category,
         price: dish.price,
         notes: sanitizer.sanitize.keepUnicode(dish.notes),
         imgUrl: img,
         weight: dish.weight,
-        allergens: {
-          gluten: dish.allergens.gluten,
-          lactose: dish.allergens.lactose,
-          soy: dish.allergens.soy,
-          eggs: dish.allergens.eggs,
-          seaFood: dish.allergens.seaFood,
-          peanuts: dish.allergens.peanuts,
-          sesame: dish.allergens.sesame,
-        },
+        allergens: dish.allergens,
         ingredients: dish.ingredients,
         glicemicIndex: dish.glicemicIndex,
         kCal: dish.kCal,

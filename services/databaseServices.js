@@ -14,6 +14,7 @@ export async function removeDish(dishId) {
   const deletedDoc = await Dish.findByIdAndDelete(dishId).catch((e) => {
     throw newError("Usunięcie dania nie powiodło się.", 500);
   });
+  await deleteImage(deletedDoc.imgUrl);
   await Restaurant.findByIdAndUpdate(deletedDoc.restaurantId, {
     $pull: { dishes: dishId },
   }).catch((error) => {

@@ -2,6 +2,7 @@ import express from "express";
 import { createDish } from "../services/dataPrepServices.js";
 import {
   removeDish,
+  fetchDish,
   addDishToRestaurant,
   setDishVisibility,
 } from "../services/databaseServices.js";
@@ -33,7 +34,7 @@ router.post("/", async (req, res) => {
     await validateRestaurant(req.body.restaurantId);
     const token = req.headers["x-auth-token"];
     validateUserToken(token);
-    const dish = await createDish(req.body, req.body.restaurantId, true);
+    const dish = await createDish(req.body, req.body.restaurantId);
     await dish.save();
     await addDishToRestaurant(req.body.restaurantId, dish._id);
     res.status(201).send(dish._id);
@@ -77,10 +78,12 @@ router.put("/", async (req, res) => {
   try {
     await validateDishId(req.body.dishId);
     const token = req.headers["x-auth-token"];
-    validateUserToken(token);
-    const dish = createDish(req.body.dish, req.body.restaurantId, false);
+    const decodedToken = validateUserToken(token);
+    await verifyDishAccess(req.body.dishId, decodedToken);
+    const oldDish = await fetchDish(req.body.dishId);
+    const dish = await createDish(req.body, req.body.restaurantId, oldDish);
     await Dish.replaceOne({ _id: req.body.dishId }, dish);
-    res.sendStatus(200);
+    res.send(dish);
   } catch (error) {
     handleError(error, res);
   }

@@ -112,11 +112,9 @@ export async function verifyDishAccess(dishId, decodedToken) {
     }
   );
   const restaurants = fetch.restaurants;
-  const restaurantId = await Dish.findById(dishId, "restaurantId").catch(
-    (error) => {
-      throw newError("Nie znaleziono dania.", 404);
-    }
-  );
+  const restaurantId = await Dish.findById(dishId).catch((error) => {
+    throw newError("Nie znaleziono dania.", 404);
+  });
   const valid = restaurants.includes(restaurantId.restaurantId);
   if (!valid) throw newError("Nie masz dostępu do tego dania.", 401);
 }

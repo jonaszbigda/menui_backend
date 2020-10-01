@@ -1,4 +1,5 @@
 import azureBlob from "@azure/storage-blob";
+import e from "express";
 import getStream from "into-stream";
 import { newError } from "./services.js";
 
@@ -77,10 +78,18 @@ export function setDeleteTempBlobTimer(blobName, containerClient, minutes) {
 }
 
 export async function deleteImage(url) {
-  const containerClient = blobServiceClient.getContainerClient(container);
-  const containerUrl = containerClient.url + "/";
-  const blobName = url.replace(containerUrl, "");
-  console.log(`BLOB NAME = ${blobName}`);
-  const blob = containerClient.getBlobClient(blobName);
-  await blob.delete();
+  if (!url || url === "" || url === "empty") {
+    return;
+  } else {
+    try {
+      const containerClient = blobServiceClient.getContainerClient(container);
+      const containerUrl = containerClient.url + "/";
+      const blobName = url.replace(containerUrl, "");
+      console.log(`BLOB NAME = ${blobName}`);
+      const blob = containerClient.getBlobClient(blobName);
+      await blob.delete();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

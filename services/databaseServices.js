@@ -120,10 +120,25 @@ async function checkIfCategoryExists(restaurant, category) {
   }
 }
 
-async function checkIfAlreadyInLunchMenu(restaurant, dishId) {
+async function checkIfSetAlreadyInLunchMenu(restaurant, setName) {
   const lunchMenu = restaurant.lunchMenu;
-  if (lunchMenu.includes(dishId)) {
-    throw newError("Podane danie jest już w lunch menu", 200);
+  for (lunchSet of lunchMenu) {
+    if (lunchSet.lunchSetName === setName) {
+      throw newError("Nazwa zestawu jest zajęta", 409);
+    }
+    return;
+  }
+}
+
+async function checkIfAlreadyInSet(restaurant, setName, dishId) {
+  const lunchMenu = restaurant.lunchMenu;
+  for (lunchSet of lunchMenu) {
+    if (lunchSet.lunchSetName === setName) {
+      const dishes = lunchSet.lunchSetDishes;
+      if (dishes.includes(dishId)) {
+        throw newError("Danie jest już w podanym zestawie", 500);
+      }
+    }
   }
 }
 
@@ -157,12 +172,34 @@ export async function setDishVisibility(dishId, visible) {
   );
 }
 
-export async function changeLunchMenu(restaurantId, dishId, action) {
+export async function changeLunchMenuSet(restaurantId, action, lunchSet) {
   if (action === "add") {
     const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
       throw newError("Nie udało się pobrać restauracji.", 404);
     });
-    await checkIfAlreadyInLunchMenu(restaurant, dishId);
+    await checkIfSetAlreadyInLunchMenu(restaurant, lunchSet.lunchSetName);
+    await Restaurant.findByIdAndUpdate(restaurantId, {
+      $push: { lunchMenu: lunchSet },
+    }).catch((e) => {
+      throw newError("Nie udało się dodać zestawu do lunch menu.", 500);
+    });
+  } else if (action === "delete") {
+    await Restaurant.findByIdAndUpdate(restaurantId, {
+      $pull: { lunchMenu: lunchSet },
+    }).catch((e) => {
+      throw newError("Nie udało się usunąć zestawu.", 500);
+    });
+  } else {
+    throw newError("Nie sprecyzowano akcji", 500);
+  }
+}
+
+export async function changeLunchMenu(restaurantId, setName, dishId, action) {
+  if (action === "add") {
+    const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
+      throw newError("Nie udało się pobrać restauracji.", 404);
+    });
+    await checkIfAlreadyInSet(restaurant, setName, dishId);
     await Restaurant.findByIdAndUpdate(restaurantId, {
       $push: { lunchMenu: dishId },
     }).catch((e) => {

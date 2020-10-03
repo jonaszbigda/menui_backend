@@ -7,6 +7,7 @@ import {
   removeRestaurant,
   changeCategory,
   changeLunchMenu,
+  changeLunchMenuSet,
   fetchUser,
 } from "../services/databaseServices.js";
 import {
@@ -103,6 +104,23 @@ router.post("/category", async (req, res) => {
 
 // CHANGE LUNCH MENU
 
+router.post("/lunchSet", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    await validateRestaurant(req.body.restaurantId);
+    await verifyRestaurantAccess(req.body.restaurantId, user);
+    await changeLunchMenuSet(
+      req.body.restaurantId,
+      req.body.action,
+      req.body.set
+    );
+    res.sendStatus(200);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
 router.post("/lunch", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
@@ -111,11 +129,11 @@ router.post("/lunch", async (req, res) => {
     await verifyRestaurantAccess(req.body.restaurantId, user);
     await changeLunchMenu(
       req.body.restaurantId,
+      req.body.setName,
       req.body.dishId,
       req.body.action
     );
-    const restaurant = await fetchRestaurant(req.body.restaurantId);
-    res.send(restaurant);
+    res.sendStatus(200);
   } catch (error) {
     handleError(error, res);
   }

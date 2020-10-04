@@ -9,6 +9,8 @@ import {
   changeLunchMenu,
   changeLunchMenuSet,
   fetchUser,
+  initializePayment,
+  renewSubscription,
 } from "../services/databaseServices.js";
 import {
   decodeAndSanitize,
@@ -154,6 +156,25 @@ router.post("/delete", async (req, res) => {
     await verifyRestaurantAccess(req.body.restaurantId, user);
     await removeRestaurant(req.body.restaurantId, user._id);
     res.send("Restauracja została pomyślnie usunięta.");
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// ACTIVATE SUBSCRIPTION
+
+router.post("/subscription", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    await validateRestaurant(req.body.restaurantId);
+    /* const response = await initializePayment(
+      req.body.restaurantId,
+      req.body.userData,
+      req.body.type
+    ); */
+    await renewSubscription(req.body.restaurantId, req.body.type);
+    res.send(200);
   } catch (error) {
     handleError(error, res);
   }

@@ -1,8 +1,16 @@
 import Restaurant from "../models/restaurant.js";
 import Dish from "../models/dish.js";
 import User from "../models/users.js";
+import Payments from "../models/payments.js";
 import { deleteImage } from "./azureServices.js";
+import {
+  appendDishToLunchSet,
+  removeDishFromLunchSet,
+} from "./dataPrepServices.js";
 import { newError } from "./services.js";
+import mongoose from "mongoose";
+import axios from "axios";
+import crypto from "crypto";
 
 export async function changeUserPass(userId, newPass) {
   User.findByIdAndUpdate(userId, { $set: { password: newPass } }).catch((e) => {
@@ -132,7 +140,7 @@ async function checkIfSetAlreadyInLunchMenu(restaurant, setName) {
 
 async function checkIfAlreadyInSet(restaurant, setName, dishId) {
   const lunchMenu = restaurant.lunchMenu;
-  for (lunchSet of lunchMenu) {
+  for (const lunchSet of lunchMenu) {
     if (lunchSet.lunchSetName === setName) {
       const dishes = lunchSet.lunchSetDishes;
       if (dishes.includes(dishId)) {
@@ -200,14 +208,27 @@ export async function changeLunchMenu(restaurantId, setName, dishId, action) {
       throw newError("Nie udało się pobrać restauracji.", 404);
     });
     await checkIfAlreadyInSet(restaurant, setName, dishId);
+    const updatedLunchMenu = appendDishToLunchSet(
+      restaurant.lunchMenu,
+      setName,
+      dishId
+    );
     await Restaurant.findByIdAndUpdate(restaurantId, {
-      $push: { lunchMenu: dishId },
+      $set: { lunchMenu: updatedLunchMenu },
     }).catch((e) => {
       throw newError("Nie udało się dodać dania do lunch menu.", 500);
     });
   } else if (action === "delete") {
+    const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
+      throw newError("Nie udało się pobrać restauracji.", 404);
+    });
+    const updatedLunchMenu = removeDishFromLunchSet(
+      restaurant.lunchMenu,
+      setName,
+      dishId
+    );
     await Restaurant.findByIdAndUpdate(restaurantId, {
-      $pull: { lunchMenu: dishId },
+      $set: { lunchMenu: updatedLunchMenu },
     }).catch((e) => {
       throw newError("Nie udało się usunąć dania.", 500);
     });
@@ -253,4 +274,65 @@ export async function fetchUser(email) {
   const user = await User.findOne({ email: email });
   if (!user) throw newError("Użytkownik nie istnieje", 404);
   return user;
+}
+
+function amountFromType(type) {
+  if (type === 1) {
+    return 6150;
+  } else if (type === 12) {
+    return 61500;
+  } else {
+    return 0;
+  }
+}
+
+function controlSum(sessionId, merchantId, amount, currency) {
+  const input = {
+    sessionId: sessionId,
+    merchantId: merchantId,
+    amount: amount,
+    currency: currency,
+    crc: "???? wie co tu ma być",
+  };
+  let hash = crypto.createHash("sha384");
+  const checkSum = hash.update(input, "utf8");
+  return checkSum;
+}
+
+async function registerTransaction(paymentInfo, userData) {
+  const data = {
+    merchantId: 11111,
+    posId: paymentInfo.type,
+    sessionId: paymentInfo._id,
+    amount: paymentInfo.amount,
+    currency: "PLN",
+    description: `Subskrypcja Menui na: ${paymentInfo.months} miesięcy.`,
+    email: userData.userEmail,
+    client: `${userData.firstname} ${userData.lastname}`,
+    country: "PL",
+    language: "pl",
+    urlReturn: "http://test.pl",
+    sign: controlSum(paymentInfo._id, 11111, paymentInfo.amount, "PLN"),
+  };
+  const response = await axios({
+    method: "POST",
+    url: "https://sandbox.przelewy24.pl/api/v1",
+    data: data,
+  }).catch((error) => {
+    console.log(error);
+    throw newError("Błąd.", 500);
+  });
+  return response;
+}
+
+export async function initializePayment(restaurantId, userData, type) {
+  const newPayment = new Payments({
+    _id: new mongoose.Types.ObjectId(),
+    restaurantId: restaurantId,
+    amount: amountFromType(type),
+    months: type,
+  });
+  const payment = await registerTransaction(newPayment, userData);
+  newPayment.save();
+  return payment;
 }

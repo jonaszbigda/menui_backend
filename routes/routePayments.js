@@ -1,4 +1,5 @@
 import express from "express";
+import { handleError } from "../services/services.js";
 
 var router = express.Router();
 
@@ -6,7 +7,7 @@ router.post("/", async (req, res) => {
   try {
     console.log("test");
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
   }
 });
 

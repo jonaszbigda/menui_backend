@@ -160,3 +160,32 @@ export async function createDish(dish, restaurantId, oldDish) {
     throw newError("Cannot create dish", 500);
   }
 }
+
+export function appendDishToLunchSet(lunchMenu, setName, dishId) {
+  const result = lunchMenu.map((lunchSet) => {
+    if (lunchSet.lunchSetName === setName) {
+      let updatedSet = lunchSet;
+      updatedSet.lunchSetDishes.push(dishId);
+      return updatedSet;
+    } else {
+      return lunchSet;
+    }
+  });
+  return result;
+}
+
+export function removeDishFromLunchSet(lunchMenu, setName, dishId) {
+  const result = lunchMenu.map((lunchSet) => {
+    if (lunchSet.lunchSetName === setName) {
+      let updatedSet = lunchSet;
+      const dishIndex = updatedSet.lunchSetDishes.indexOf(dishId);
+      if (dishIndex > -1) {
+        updatedSet.lunchSetDishes.splice(dishIndex, 1);
+      }
+      return updatedSet;
+    } else {
+      return lunchSet;
+    }
+  });
+  return result;
+}

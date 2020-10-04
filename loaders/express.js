@@ -7,7 +7,7 @@ import routeRestaurant from "../routes/routeRestaurant.js";
 import routeUser from "../routes/routeUser.js";
 import routeSearch from "../routes/routeSearch.js";
 import routeImg from "../routes/routeImg.js";
-import routeTest from "../routes/routeTest.js";
+import routePayments from "../routes/routePayments.js";
 
 export default ({ app, secret }) => {
   const limiter = rateLimiter({
@@ -28,7 +28,7 @@ export default ({ app, secret }) => {
   app.use("/img", routeImg);
   app.use("/user", routeUser);
   app.use("/search", routeSearch);
-  app.use("/test", routeTest);
+  app.use("/payments", routePayments);
 
   return app;
 };

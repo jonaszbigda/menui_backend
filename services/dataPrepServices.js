@@ -86,11 +86,16 @@ export async function createRestaurant(request, oldRestaurant) {
         imgUrl: img,
         workingHours: request.workingHours,
         lunchHours: request.lunchHours,
+        lunchMenu: oldRestaurant.lunchMenu,
+        categories: oldRestaurant.categories,
         description: sanitizer.sanitize.keepUnicode(request.description),
         tags: request.tags,
         links: request.links,
         phone: request.phone,
         hidden: request.hidden,
+        subscriptionActive: oldRestaurant.subscriptionActive,
+        subscriptionDue: oldRestaurant.subscriptionDue,
+        subscriptionStarted: oldRestaurant.subscriptionStarted,
       });
       return restaurant;
     }

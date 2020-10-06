@@ -1,11 +1,24 @@
 import mongoose from "mongoose";
+import { dbPass, dbUser, dbHost, dbPort, dbName } from "../config/index.js";
 
-export default async ({ pass }) => {
+export default async () => {
   const connection = await mongoose.connect(
-    "mongodb+srv://menui_db_user:" +
-      pass +
-      "@menui-database.9quwf.mongodb.net/<dbname>?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true },
+    "mongodb://" +
+      dbHost +
+      ":" +
+      dbPort +
+      "/" +
+      dbName +
+      "?ssl=true&replicaSet=globaldb",
+    {
+      auth: {
+        user: dbUser,
+        password: dbPass,
+      },
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      retryWrites: false,
+    },
     (err) => {
       if (err) console.log("Unable to connect :(");
       else console.log("Connected To Database");

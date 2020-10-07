@@ -2,7 +2,7 @@
   "name": "menui_backend",
   "version": "1.0.0",
   "description": "backend for Menui",
-  "main": "app.js",
+  "main": "app.mjs",
   "scripts": {
     "test": "jest"
   },

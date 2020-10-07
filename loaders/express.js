@@ -1,18 +1,18 @@
-import bodyParser from "body-parser";
-import cors from "cors";
-import rateLimiter from "express-rate-limit";
-import helmet from "helmet";
-import routeDish from "../routes/routeDish.js";
-import routeRestaurant from "../routes/routeRestaurant.js";
-import routeUser from "../routes/routeUser.js";
-import routeSearch from "../routes/routeSearch.js";
-import routeImg from "../routes/routeImg.js";
-import routePayments from "../routes/routePayments.js";
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const rateLimiter = require("express-rate-limit");
+const helmet = require("helmet");
+const routeDish = require("../routes/routeDish.js");
+const routeRestaurant = require("../routes/routeRestaurant.js");
+const routeUser = require("../routes/routeUser.js");
+const routeSearch = require("../routes/routeSearch.js");
+const routeImg = require("../routes/routeImg.js");
+const routePayments = require("../routes/routePayments.js");
 
-export default ({ app, secret }) => {
+const loadExpress = ({ app, secret }) => {
   const limiter = rateLimiter({
     windowMs: 15 * 60 * 1000, //time window
-    max: 100, //requests from a single IP for a time window
+    max: 100, //requests = a single IP for a time window
   });
 
   app.use(cors({ exposedHeaders: "x-auth-token" }));
@@ -32,3 +32,5 @@ export default ({ app, secret }) => {
 
   return app;
 };
+
+module.exports = loadExpress;

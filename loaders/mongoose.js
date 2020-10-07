@@ -1,7 +1,13 @@
-import mongoose from "mongoose";
-import { dbPass, dbUser, dbHost, dbPort, dbName } from "../config/index.js";
+const mongoose = require("mongoose");
+const {
+  dbPass,
+  dbUser,
+  dbHost,
+  dbPort,
+  dbName,
+} = require("../config/index.js");
 
-export default async () => {
+const loadMongoose = async () => {
   const connection = await mongoose.connect(
     "mongodb://" +
       dbHost +
@@ -25,3 +31,5 @@ export default async () => {
     }
   );
 };
+
+module.exports = loadMongoose;

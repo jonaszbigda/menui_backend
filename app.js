@@ -1,8 +1,8 @@
-import * as config from "./config/index.js";
+const config = require("./config/index.js");
 const { port, dbPass, cookiesSecret } = config;
-import express from "express";
+const express = require("express");
 const app = express();
-import loaders from "./loaders/index.js";
+const loaders = require("./loaders/index.js");
 //
 // Server init function
 //

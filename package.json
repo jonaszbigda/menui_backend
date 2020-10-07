@@ -2,12 +2,11 @@
   "name": "menui_backend",
   "version": "1.0.0",
   "description": "backend for Menui",
-  "main": "app.mjs",
+  "main": "app.js",
   "scripts": {
     "test": "jest"
   },
   "keywords": [],
-  "type": "module",
   "author": "Jonasz Bigda",
   "license": "ISC",
   "dependencies": {

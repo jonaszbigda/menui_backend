@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/f9e95184-7fca-4291-b16c-c454a5c33883/resourceGroups/Menui/providers/Microsoft.Web/sites/menui",
+    "appService.deploySubpath": "."
+}

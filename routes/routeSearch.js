@@ -7,7 +7,7 @@ var router = express.Router();
 
 // SEARCH RESTAURANTS BY NAME OR CITY
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   if (req.query.string.length > 0) {
     const query = sanitizer.sanitize.keepUnicode(decodeURI(req.query.string));
     const regex = new RegExp(query, "i");
@@ -23,6 +23,7 @@ router.get("/", (req, res) => {
       "_id name city imgUrl workingHours description tags location links",
       (err, results) => {
         if (err) {
+          console.log(err);
           res.sendStatus(500);
         } else {
           res.send(results);

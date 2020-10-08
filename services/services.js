@@ -1,15 +1,14 @@
-import Restaurant from "../models/restaurant.js";
-import Dish from "../models/dish.js";
-import User from "../models/users.js";
-import mongoose from "mongoose";
-import sanitizer from "string-sanitizer";
-import { renameBlob } from "./azureServices.js";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import * as config from "../config/index.js";
-const { jwtSecret } = config;
+const Restaurant = require("../models/restaurant.js");
+const Dish = require("../models/dish.js");
+const User = require("../models/users.js");
+const mongoose = require("mongoose");
+const sanitizer = require("string-sanitizer");
+const { renameBlob } = require("./azureServices.js");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const { jwtSecret } = require("../config/index.js");
 
-export function newError(message, status) {
+function newError(message, status) {
   const error = {
     message: message,
     status: status,
@@ -17,7 +16,7 @@ export function newError(message, status) {
   return error;
 }
 
-export function handleError(error, responseObject) {
+function handleError(error, responseObject) {
   if (!error.status) {
     console.log(error);
     responseObject.sendStatus(500);
@@ -26,7 +25,7 @@ export function handleError(error, responseObject) {
   }
 }
 
-export async function validateRestaurant(id) {
+async function validateRestaurant(id) {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw newError("Nieprawidłowy ID", 204);
   let valid = await Restaurant.exists({ _id: id });
@@ -34,17 +33,17 @@ export async function validateRestaurant(id) {
   return true;
 }
 
-export function decodeAndSanitize(query) {
+function decodeAndSanitize(query) {
   if (!query) throw newError("Brak danych.", 204);
   return sanitizer.sanitize.keepUnicode(decodeURI(query));
 }
 
-export async function checkPassword(password, hash) {
+async function checkPassword(password, hash) {
   const result = await bcrypt.compare(password, hash);
   if (!result) throw newError("Hasło nieprawidłowe", 401);
 }
 
-export function generateAuthToken(user) {
+function generateAuthToken(user) {
   const token = jwt.sign(
     {
       email: user.email,
@@ -71,13 +70,15 @@ function generatePasswordResetToken(email) {
   return token;
 }
 
-export function generatePasswordResetLink(email) {
+// SET FRONTEND URL HERE
+
+function generatePasswordResetLink(email) {
   const token = generatePasswordResetToken(email);
   const link = `localhost:3000/resetpassword?token=${token}`;
   return link;
 }
 
-export async function checkEmailTaken(email) {
+async function checkEmailTaken(email) {
   if (!email) throw newError("Brak adresu email", 204);
   await User.exists({ email: email }).then((res) => {
     if (res) {
@@ -86,7 +87,7 @@ export async function checkEmailTaken(email) {
   });
 }
 
-export function validateUserToken(token) {
+function validateUserToken(token) {
   if (!token) throw newError("Brak dostępu", 401);
   try {
     const verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
@@ -97,7 +98,7 @@ export function validateUserToken(token) {
   }
 }
 
-export async function validateDishId(id) {
+async function validateDishId(id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw newError("Niewłaściwy ID", 400);
   }
@@ -105,7 +106,7 @@ export async function validateDishId(id) {
   if (!dishDoesExist) throw newError("Te danie nie istnieje w bazie.", 404);
 }
 
-export async function verifyDishAccess(dishId, decodedToken) {
+async function verifyDishAccess(dishId, decodedToken) {
   const fetch = await User.findById(decodedToken.id, "restaurants").catch(
     (error) => {
       throw newError("Nie znaleziono użytkownika.", 500);
@@ -119,7 +120,7 @@ export async function verifyDishAccess(dishId, decodedToken) {
   if (!valid) throw newError("Nie masz dostępu do tego dania.", 401);
 }
 
-export async function verifyRestaurantAccess(restaurantId, decodedToken) {
+async function verifyRestaurantAccess(restaurantId, decodedToken) {
   const fetch = await User.findById(decodedToken.id, "restaurants").catch(
     (error) => {
       throw newError("Nie znaleziono użytkownika.", 500);
@@ -130,7 +131,7 @@ export async function verifyRestaurantAccess(restaurantId, decodedToken) {
   if (!valid) throw newError("Nie masz dostępu do tej restauracji.", 401);
 }
 
-export function yearFromNowDate() {
+function yearFromNowDate() {
   Date.prototype.addDays = function (days) {
     var date = new Date(this.valueOf());
     date.setDate(date.getDate() + days);
@@ -140,7 +141,7 @@ export function yearFromNowDate() {
   return date.addDays(365);
 }
 
-export async function hashPass(pass) {
+async function hashPass(pass) {
   if (pass.length < 6) {
     throw newError("Hasło za krótkie.", 500);
   }
@@ -153,7 +154,23 @@ export async function hashPass(pass) {
   }
 }
 
-export async function saveImage(url) {
+async function saveImage(url) {
   const newURL = await renameBlob(url);
   return newURL;
 }
+
+exports.newError = newError;
+exports.handleError = handleError;
+exports.validateRestaurant = validateRestaurant;
+exports.decodeAndSanitize = decodeAndSanitize;
+exports.checkPassword = checkPassword;
+exports.generateAuthToken = generateAuthToken;
+exports.generatePasswordResetLink = generatePasswordResetLink;
+exports.checkEmailTaken = checkEmailTaken;
+exports.validateUserToken = validateUserToken;
+exports.validateDishId = validateDishId;
+exports.verifyDishAccess = verifyDishAccess;
+exports.verifyRestaurantAccess = verifyRestaurantAccess;
+exports.yearFromNowDate = yearFromNowDate;
+exports.hashPass = hashPass;
+exports.saveImage = saveImage;

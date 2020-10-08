@@ -1,5 +1,5 @@
-import express from "express";
-import { handleError } from "../services/services.js";
+const express = require("express");
+const { handleError } = require("../services/services.js");
 
 var router = express.Router();
 
@@ -11,4 +11,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

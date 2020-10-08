@@ -1,8 +1,8 @@
-import express from "express";
-import * as services from "../services/services.js";
-import { uploadBlob } from "../services/azureServices.js";
+const express = require("express");
+const { validateUserToken, handleError } = require("../services/services.js");
+const { uploadBlob } = require("../services/azureServices.js");
 // Azure
-import multer from "multer";
+const multer = require("multer");
 
 var router = express.Router();
 var storage = multer.memoryStorage();
@@ -22,11 +22,11 @@ const uploadStrategy = multer({
 router.post("/", uploadStrategy, async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
-    services.validateUserToken(token);
+    validateUserToken(token);
     await uploadBlob(req, res);
   } catch (error) {
-    services.handleError(error, res);
+    handleError(error, res);
   }
 });
 
-export default router;
+module.exports = router;

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const restaurantSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
@@ -75,4 +75,4 @@ const restaurantSchema = mongoose.Schema({
   dishes: [mongoose.Types.ObjectId],
 });
 
-export default mongoose.model("Restaurant", restaurantSchema);
+module.exports = mongoose.model("Restaurant", restaurantSchema);

@@ -1,24 +1,24 @@
-import Restaurant from "../models/restaurant.js";
-import Dish from "../models/dish.js";
-import User from "../models/users.js";
-import Payments from "../models/payments.js";
-import { deleteImage } from "./azureServices.js";
-import {
+const Restaurant = require("../models/restaurant.js");
+const Dish = require("../models/dish.js");
+const User = require("../models/users.js");
+const Payments = require("../models/payments.js");
+const { deleteImage } = require("./azureServices.js");
+const {
   appendDishToLunchSet,
   removeDishFromLunchSet,
-} from "./dataPrepServices.js";
-import { newError } from "./services.js";
-import mongoose from "mongoose";
-import axios from "axios";
-import crypto from "crypto";
+} = require("./dataPrepServices.js");
+const { newError } = require("./services.js");
+const mongoose = require("mongoose");
+const axios = require("axios");
+const crypto = require("crypto");
 
-export async function changeUserPass(userId, newPass) {
+async function changeUserPass(userId, newPass) {
   User.findByIdAndUpdate(userId, { $set: { password: newPass } }).catch((e) => {
     throw newError("Zmiana hasła nie powiodła się.", 500);
   });
 }
 
-export async function removeDish(dishId) {
+async function removeDish(dishId) {
   const deletedDoc = await Dish.findByIdAndDelete(dishId).catch((e) => {
     throw newError("Usunięcie dania nie powiodło się.", 500);
   });
@@ -30,7 +30,7 @@ export async function removeDish(dishId) {
   });
 }
 
-export async function removeRestaurant(restaurantId, userId) {
+async function removeRestaurant(restaurantId, userId) {
   const deletedDoc = await Restaurant.findByIdAndDelete(restaurantId).catch(
     (e) => {
       throw newError("Usunięcie nie powiodło się.", 500);
@@ -53,7 +53,7 @@ export async function removeRestaurant(restaurantId, userId) {
   });
 }
 
-export async function addDishToRestaurant(restaurantId, dishId) {
+async function addDishToRestaurant(restaurantId, dishId) {
   await Restaurant.updateOne(
     { _id: restaurantId },
     { $push: { dishes: dishId } }
@@ -62,7 +62,7 @@ export async function addDishToRestaurant(restaurantId, dishId) {
   });
 }
 
-export async function addRestaurantToUser(user, restaurant) {
+async function addRestaurantToUser(user, restaurant) {
   await User.findByIdAndUpdate(user.id, {
     $push: { restaurants: restaurant._id },
   }).catch((e) => {
@@ -100,7 +100,7 @@ function startDate(restaurant) {
   }
 }
 
-export async function renewSubscription(restaurantId, monthsToAdd) {
+async function renewSubscription(restaurantId, monthsToAdd) {
   const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
     throw newError("Nie udało się pobrać restauracji.", 404);
   });
@@ -150,7 +150,7 @@ async function checkIfAlreadyInSet(restaurant, setName, dishId) {
   }
 }
 
-export async function changeCategory(restaurantId, categoryName, action) {
+async function changeCategory(restaurantId, categoryName, action) {
   if (action === "add") {
     const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
       throw newError("Nie udało się pobrać restauracji.", 404);
@@ -172,7 +172,7 @@ export async function changeCategory(restaurantId, categoryName, action) {
   }
 }
 
-export async function setDishVisibility(dishId, visible) {
+async function setDishVisibility(dishId, visible) {
   await Dish.findByIdAndUpdate(dishId, { $set: { hidden: !visible } }).catch(
     (e) => {
       throw newError("Nie udało się zmienić dania.", 500);
@@ -180,7 +180,7 @@ export async function setDishVisibility(dishId, visible) {
   );
 }
 
-export async function changeLunchMenuSet(restaurantId, action, lunchSet) {
+async function changeLunchMenuSet(restaurantId, action, lunchSet) {
   if (action === "add") {
     const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
       throw newError("Nie udało się pobrać restauracji.", 404);
@@ -202,7 +202,7 @@ export async function changeLunchMenuSet(restaurantId, action, lunchSet) {
   }
 }
 
-export async function changeLunchMenu(restaurantId, setName, dishId, action) {
+async function changeLunchMenu(restaurantId, setName, dishId, action) {
   if (action === "add") {
     const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
       throw newError("Nie udało się pobrać restauracji.", 404);
@@ -237,14 +237,14 @@ export async function changeLunchMenu(restaurantId, setName, dishId, action) {
   }
 }
 
-export async function fetchRestaurant(id) {
+async function fetchRestaurant(id) {
   const data = await Restaurant.findById(id).catch((e) => {
     throw newError("Nie udało się pobrać restauracji.", 500);
   });
   return data;
 }
 
-export async function fetchMultipleRestaurants(idArray) {
+async function fetchMultipleRestaurants(idArray) {
   let data = [];
   for (const id of idArray) {
     let response = await fetchRestaurant(id);
@@ -253,7 +253,7 @@ export async function fetchMultipleRestaurants(idArray) {
   return data;
 }
 
-export async function fetchAllDishesForRestaurant(restaurant) {
+async function fetchAllDishesForRestaurant(restaurant) {
   let dishes = [];
   for (const dish of restaurant.dishes) {
     let res = await fetchDish(dish._id);
@@ -262,14 +262,14 @@ export async function fetchAllDishesForRestaurant(restaurant) {
   return dishes;
 }
 
-export async function fetchDish(id) {
+async function fetchDish(id) {
   let data = await Dish.findById(id).catch((e) => {
     throw newError(`Nie udało się pobrać ${id}`, 404);
   });
   return data;
 }
 
-export async function fetchUser(email) {
+async function fetchUser(email) {
   if (!email) throw newError("Brak danych", 204);
   const user = await User.findOne({ email: email });
   if (!user) throw newError("Użytkownik nie istnieje", 404);
@@ -325,7 +325,7 @@ async function registerTransaction(paymentInfo, userData) {
   return response;
 }
 
-export async function initializePayment(restaurantId, userData, type) {
+async function initializePayment(restaurantId, userData, type) {
   const newPayment = new Payments({
     _id: new mongoose.Types.ObjectId(),
     restaurantId: restaurantId,
@@ -336,3 +336,20 @@ export async function initializePayment(restaurantId, userData, type) {
   newPayment.save();
   return payment;
 }
+
+exports.changeUserPass = changeUserPass;
+exports.removeDish = removeDish;
+exports.removeRestaurant = removeRestaurant;
+exports.addDishToRestaurant = addDishToRestaurant;
+exports.addRestaurantToUser = addRestaurantToUser;
+exports.renewSubscription = renewSubscription;
+exports.changeCategory = changeCategory;
+exports.setDishVisibility = setDishVisibility;
+exports.changeLunchMenuSet = changeLunchMenuSet;
+exports.changeLunchMenu = changeLunchMenu;
+exports.fetchRestaurant = fetchRestaurant;
+exports.fetchMultipleRestaurants = fetchMultipleRestaurants;
+exports.fetchAllDishesForRestaurant = fetchAllDishesForRestaurant;
+exports.fetchDish = fetchDish;
+exports.fetchUser = fetchUser;
+exports.initializePayment = initializePayment;

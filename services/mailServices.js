@@ -1,8 +1,11 @@
-import nodemailer from "nodemailer";
-import path from "path";
-import { MAIL_PASS } from "../config/index.js";
-import makeResetPassMessage from "../config/mailTemplateReset.js";
-import { newError, generatePasswordResetLink } from "../services/services.js";
+const nodemailer = require("nodemailer");
+const path = require("path");
+const { MAIL_PASS } = require("../config/index.js");
+const makeResetPassMessage = require("../config/mailTemplateReset.js");
+const {
+  newError,
+  generatePasswordResetLink,
+} = require("../services/services.js");
 
 const images = path.resolve("images");
 
@@ -33,7 +36,7 @@ async function sendMail(reciever, subject, textMessage, htmlMessage) {
   });
 }
 
-export async function resetPassword(email) {
+async function resetPassword(email) {
   const resetLink = generatePasswordResetLink(email);
   const message = makeResetPassMessage(resetLink);
   await sendMail(
@@ -45,3 +48,5 @@ export async function resetPassword(email) {
     throw newError("Nieznany błąd podczas resetu hasła", 500);
   });
 }
+
+exports.resetPassword = resetPassword;

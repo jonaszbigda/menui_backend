@@ -1,7 +1,7 @@
-import express from "express";
-import Restaurant from "../models/restaurant.js";
-import sanitizer from "string-sanitizer";
-import { handleError } from "../services/services.js";
+const express = require("express");
+const Restaurant = require("../models/restaurant.js");
+const sanitizer = require("string-sanitizer");
+const { handleError } = require("../services/services.js");
 
 var router = express.Router();
 
@@ -89,4 +89,4 @@ router.get("/autocomplete/", (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

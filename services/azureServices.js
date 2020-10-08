@@ -1,7 +1,6 @@
-import azureBlob from "@azure/storage-blob";
-import e from "express";
-import getStream from "into-stream";
-import { newError } from "./services.js";
+const azureBlob = require("@azure/storage-blob");
+const getStream = require("into-stream");
+const { newError } = require("./services.js");
 
 // SETUP
 const containerURL = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/img/`;
@@ -19,7 +18,7 @@ const blobServiceClient = new azureBlob.BlobServiceClient(
 );
 
 // CODE
-export async function renameBlob(blobURL) {
+async function renameBlob(blobURL) {
   try {
     const blobName = blobURL.replace(containerURL, "");
     const containerClient = blobServiceClient.getContainerClient(container);
@@ -33,7 +32,7 @@ export async function renameBlob(blobURL) {
   }
 }
 
-export async function uploadBlob(request, resp) {
+async function uploadBlob(request, resp) {
   const blobName = makeTempBlobName(request.file.originalname);
   const stream = getStream(request.file.buffer);
   const containerClient = blobServiceClient.getContainerClient(container);
@@ -60,24 +59,24 @@ export async function uploadBlob(request, resp) {
   }
 }
 
-export function removePrefix(string) {
+function removePrefix(string) {
   const newString = string.replace("TEMP_", "");
   return newString;
 }
 
-export function makeTempBlobName(originalName) {
+function makeTempBlobName(originalName) {
   const identifier = Math.random().toString().replace(/0\./, "");
   return `TEMP_${identifier}-${originalName}`;
 }
 
-export function setDeleteTempBlobTimer(blobName, containerClient, minutes) {
+function setDeleteTempBlobTimer(blobName, containerClient, minutes) {
   let blob = containerClient.getBlobClient(blobName);
   setTimeout(() => {
     blob.delete();
   }, 1000 * 60 * minutes);
 }
 
-export async function deleteImage(url) {
+async function deleteImage(url) {
   if (!url || url === "" || url === "empty") {
     return;
   } else {
@@ -93,3 +92,10 @@ export async function deleteImage(url) {
     }
   }
 }
+
+exports.renameBlob = renameBlob;
+exports.uploadBlob = uploadBlob;
+exports.removePrefix = removePrefix;
+exports.makeTempBlobName = makeTempBlobName;
+exports.setDeleteTempBlobTimer = setDeleteTempBlobTimer;
+exports.deleteImage = deleteImage;

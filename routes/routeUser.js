@@ -1,7 +1,13 @@
-import express from "express";
-import { changeUserPass, fetchUser } from "../services/databaseServices.js";
-import { createUser, prepareSafeUser } from "../services/dataPrepServices.js";
-import {
+const express = require("express");
+const {
+  changeUserPass,
+  fetchUser,
+} = require("../services/databaseServices.js");
+const {
+  createUser,
+  prepareSafeUser,
+} = require("../services/dataPrepServices.js");
+const {
   newError,
   handleError,
   checkPassword,
@@ -9,8 +15,8 @@ import {
   checkEmailTaken,
   validateUserToken,
   hashPass,
-} from "../services/services.js";
-import { resetPassword } from "../services/mailServices.js";
+} = require("../services/services.js");
+const { resetPassword } = require("../services/mailServices.js");
 
 var router = express.Router();
 
@@ -101,4 +107,4 @@ router.post("/resetpass", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

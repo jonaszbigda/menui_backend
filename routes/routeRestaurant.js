@@ -1,6 +1,6 @@
-import express from "express";
-import { createRestaurant } from "../services/dataPrepServices.js";
-import {
+const express = require("express");
+const { createRestaurant } = require("../services/dataPrepServices.js");
+const {
   addRestaurantToUser,
   fetchRestaurant,
   fetchAllDishesForRestaurant,
@@ -11,8 +11,8 @@ import {
   fetchUser,
   initializePayment,
   renewSubscription,
-} from "../services/databaseServices.js";
-import {
+} = require("../services/databaseServices.js");
+const {
   decodeAndSanitize,
   validateRestaurant,
   handleError,
@@ -20,8 +20,8 @@ import {
   verifyRestaurantAccess,
   newError,
   checkPassword,
-} from "../services/services.js";
-import Restaurant from "../models/restaurant.js";
+} = require("../services/services.js");
+const Restaurant = require("../models/restaurant.js");
 
 var router = express.Router();
 
@@ -180,4 +180,4 @@ router.post("/subscription", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

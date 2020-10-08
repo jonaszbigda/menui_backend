@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
@@ -41,4 +41,4 @@ const userSchema = mongoose.Schema({
   trialUsed: Boolean,
 });
 
-export default mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema);

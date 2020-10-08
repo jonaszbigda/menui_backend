@@ -1,19 +1,19 @@
-import express from "express";
-import { createDish } from "../services/dataPrepServices.js";
-import {
+const express = require("express");
+const { createDish } = require("../services/dataPrepServices.js");
+const {
   removeDish,
   fetchDish,
   addDishToRestaurant,
   setDishVisibility,
-} from "../services/databaseServices.js";
-import {
+} = require("../services/databaseServices.js");
+const {
   validateRestaurant,
   validateUserToken,
   validateDishId,
   handleError,
   verifyDishAccess,
-} from "../services/services.js";
-import Dish from "../models/dish.js";
+} = require("../services/services.js");
+const Dish = require("../models/dish.js");
 
 var router = express.Router();
 
@@ -89,4 +89,4 @@ router.put("/", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

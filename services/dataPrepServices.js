@@ -1,13 +1,13 @@
-import { hashPass, newError, saveImage } from "./services.js";
-import sanitizer from "string-sanitizer";
-import mongoose from "mongoose";
-import Dish from "../models/dish.js";
-import User from "../models/users.js";
-import Restaurant from "../models/restaurant.js";
-import { fetchMultipleRestaurants } from "./databaseServices.js";
-import { deleteImage } from "./azureServices.js";
+const { hashPass, newError, saveImage } = require("./services.js");
+const sanitizer = require("string-sanitizer");
+const mongoose = require("mongoose");
+const Dish = require("../models/dish.js");
+const User = require("../models/users.js");
+const Restaurant = require("../models/restaurant.js");
+const { fetchMultipleRestaurants } = require("./databaseServices.js");
+const { deleteImage } = require("./azureServices.js");
 
-export async function createUser(request) {
+async function createUser(request) {
   const password = await hashPass(request.body.password);
   const user = new User({
     _id: new mongoose.Types.ObjectId(),
@@ -47,7 +47,7 @@ async function handleImageUpdate(request, previous) {
   }
 }
 
-export async function createRestaurant(request, oldRestaurant) {
+async function createRestaurant(request, oldRestaurant) {
   try {
     if (!oldRestaurant) {
       const img = await handleImageUpdate(request);
@@ -105,7 +105,7 @@ export async function createRestaurant(request, oldRestaurant) {
   }
 }
 
-export async function prepareSafeUser(user) {
+async function prepareSafeUser(user) {
   const restaurants = await fetchMultipleRestaurants(user.restaurants);
   const safeUser = {
     firstname: user.firstname,
@@ -120,7 +120,7 @@ export async function prepareSafeUser(user) {
   return safeUser;
 }
 
-export async function createDish(dish, restaurantId, oldDish) {
+async function createDish(dish, restaurantId, oldDish) {
   try {
     if (!oldDish) {
       const img = await handleImageUpdate(dish);
@@ -166,7 +166,7 @@ export async function createDish(dish, restaurantId, oldDish) {
   }
 }
 
-export function appendDishToLunchSet(lunchMenu, setName, dishId) {
+function appendDishToLunchSet(lunchMenu, setName, dishId) {
   const result = lunchMenu.map((lunchSet) => {
     if (lunchSet.lunchSetName === setName) {
       let updatedSet = lunchSet;
@@ -179,7 +179,7 @@ export function appendDishToLunchSet(lunchMenu, setName, dishId) {
   return result;
 }
 
-export function removeDishFromLunchSet(lunchMenu, setName, dishId) {
+function removeDishFromLunchSet(lunchMenu, setName, dishId) {
   const result = lunchMenu.map((lunchSet) => {
     if (lunchSet.lunchSetName === setName) {
       let updatedSet = lunchSet;
@@ -194,3 +194,10 @@ export function removeDishFromLunchSet(lunchMenu, setName, dishId) {
   });
   return result;
 }
+
+exports.createUser = createUser;
+exports.createRestaurant = createRestaurant;
+exports.prepareSafeUser = prepareSafeUser;
+exports.createDish = createDish;
+exports.appendDishToLunchSet = appendDishToLunchSet;
+exports.removeDishFromLunchSet = removeDishFromLunchSet;

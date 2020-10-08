@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const paymentSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
@@ -7,4 +7,4 @@ const paymentSchema = mongoose.Schema({
   months: Number,
 });
 
-export default mongoose.model("Payment", paymentSchema);
+module.exorts = mongoose.model("Payment", paymentSchema);

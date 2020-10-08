@@ -1,4 +1,4 @@
-export default function makeResetPassMessage(link) {
+function makeResetPassMessage(link) {
   return {
     html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -146,3 +146,5 @@ export default function makeResetPassMessage(link) {
     text: `Drogi użytkowniku, dostałeś tę wiadomość, ponieważ użyłeś opcji "Nie pamiętam hasła" w aplikacji Menui. Twoje tymczasowe hasło to: ${link}. Zaloguj się za jego pomocą i ustaw nowe bezpieczne hasło. Jeżeli nie wysyłałeś prośby o zmianę hasła, prosimy zignoruj tę wiadomość. Pozdrawiamy - Zespół Menui`,
   };
 }
+
+module.exports = makeResetPassMessage;

@@ -74,7 +74,7 @@ function generatePasswordResetToken(email) {
 
 function generatePasswordResetLink(email) {
   const token = generatePasswordResetToken(email);
-  const link = `localhost:3000/resetpassword?token=${token}`;
+  const link = `https://www.menui.pl/resetpassword?token=${token}`;
   return link;
 }
 

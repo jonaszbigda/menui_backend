@@ -8,29 +8,35 @@ var router = express.Router();
 // SEARCH RESTAURANTS BY NAME OR CITY
 
 router.get("/", async (req, res) => {
-  if (req.query.string.length > 0) {
-    const query = sanitizer.sanitize.keepUnicode(decodeURI(req.query.string));
-    const regex = new RegExp(query, "i");
+  try {
+    if (req.query.string.length > 0) {
+      const query = sanitizer.sanitize.keepUnicode(decodeURI(req.query.string));
+      const regex = new RegExp(query, "i");
 
-    Restaurant.find(
-      {
-        $and: [
-          { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
-          { $or: [{ hidden: false }, { hidden: { $exists: false } }] },
-          { subscriptionActive: true },
-        ],
-      },
-      "_id name city imgUrl workingHours description tags location links",
-      (err, results) => {
-        if (err) {
+      Restaurant.find(
+        {
+          $and: [
+            { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
+            { $or: [{ hidden: false }, { hidden: { $exists: false } }] },
+            { subscriptionActive: true },
+          ],
+        },
+        "_id name city imgUrl workingHours description tags location links"
+      )
+        .then((response) => {
+          res.send(response);
+        })
+        .catch((err) => {
           console.log(err);
           res.sendStatus(500);
-        } else {
-          res.send(results);
-        }
-      }
-    );
-  } else {
+        });
+    } else {
+      res.send({
+        results: [],
+      });
+    }
+  } catch (error) {
+    console.log(error);
     res.send({
       results: [],
     });

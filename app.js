@@ -17,7 +17,7 @@ async function startServer() {
       console.log("Server Startup Failed");
       return;
     }
-    console.log("Server is running");
+    console.log(` Server is listening at: ${port} `);
   });
 }
 

@@ -8,6 +8,7 @@ const routeUser = require("../routes/routeUser.js");
 const routeSearch = require("../routes/routeSearch.js");
 const routeImg = require("../routes/routeImg.js");
 const routePayments = require("../routes/routePayments.js");
+const routeHealth = require("../routes/routeHealth.js");
 
 const loadExpress = ({ app, secret }) => {
   const limiter = rateLimiter({
@@ -29,6 +30,7 @@ const loadExpress = ({ app, secret }) => {
   app.use("/user", routeUser);
   app.use("/search", routeSearch);
   app.use("/payments", routePayments);
+  app.use("/healthcheck", routeHealth);
 
   return app;
 };

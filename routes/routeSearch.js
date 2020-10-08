@@ -36,6 +36,12 @@ router.get("/", (req, res) => {
   }
 });
 
+// TEST
+
+router.get("/test/", (req, res) => {
+  res.send(req.query.string);
+});
+
 // SEARCH RESTAURANTS BY LOCATION
 
 router.get("/location", async (req, res) => {

@@ -16,7 +16,7 @@ const loadExpress = ({ app, secret }) => {
     max: 100, //requests = a single IP for a time window
   });
 
-  app.use(cors({ exposedHeaders: "x-auth-token" }));
+  app.use(cors({ exposedHeaders: "x-auth-token", origin: true }));
   app.use(helmet());
   app.use(limiter);
   app.use(bodyParser.json({ limit: "100kb" })); // limit JSON body payload size

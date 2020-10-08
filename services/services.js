@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const sanitizer = require("string-sanitizer");
 const { renameBlob } = require("./azureServices.js");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { jwtSecret } = require("../config/index.js");
 
 function newError(message, status) {

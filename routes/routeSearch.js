@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
             { subscriptionActive: true },
           ],
         },
-        "_id name city imgUrl workingHours description tags location links"
+        "_id name city adress type imgUrl workingHours description tags location"
       )
         .then((response) => {
           res.send(response);

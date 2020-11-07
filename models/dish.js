@@ -13,10 +13,20 @@ const dishSchema = mongoose.Schema({
     maxlength: 64,
     required: true,
   },
-  price: {
-    type: String,
-    required: true,
-  },
+  prices: [
+    {
+      priceName: {
+        type: String,
+        maxlength: 60,
+        required: true
+      },
+      price: {
+        type: String,
+        maxlength: 20,
+        required: true
+      }
+    },
+  ],
   notes: {
     type: String,
     maxlength: 200,

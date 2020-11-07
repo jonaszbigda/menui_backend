@@ -64,7 +64,9 @@
   - ##### **restaurantId**: _mongoose.Types.ObjectId_
   - ##### **name**: _String_ (max: 128, required)
   - ##### **category**: _String_ (max: 64, required)
-  - ##### **price**: String (required)
+  - ##### **prices**: (max elements 3)
+    - ##### **priceName**: _String_ (required)
+    - ##### **price**: _String_ (required)
   - ##### **notes**: _String_ (max: 128)
   - ##### **imgUrl**: _String_ (required)
   - ##### **hidden**: _Boolean_

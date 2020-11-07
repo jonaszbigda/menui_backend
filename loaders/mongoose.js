@@ -1,29 +1,18 @@
 const mongoose = require("mongoose");
 const {
   dbPass,
-  dbUser,
+/*   dbUser,
   dbHost,
-  dbPort,
+  dbPort, */
   dbName,
 } = require("../config/index.js");
 
 const loadMongoose = async () => {
   const connection = await mongoose.connect(
-    "mongodb://" +
-      dbHost +
-      ":" +
-      dbPort +
-      "/" +
-      dbName +
-      "?ssl=true&replicaSet=globaldb",
+    `mongodb+srv://menui_db_user:${dbPass}@menui-database.9quwf.mongodb.net/${dbName}?retryWrites=true&w=majority`,
     {
-      auth: {
-        user: dbUser,
-        password: dbPass,
-      },
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      retryWrites: false,
     },
     (err) => {
       if (err) console.log("Unable to connect :(");
@@ -33,3 +22,13 @@ const loadMongoose = async () => {
 };
 
 module.exports = loadMongoose;
+
+
+// AZURE
+/* "mongodb://" +
+      dbHost +
+      ":" +
+      dbPort +
+      "/" +
+      dbName +
+      "?ssl=true&replicaSet=globaldb", */

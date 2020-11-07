@@ -131,7 +131,7 @@ async function createDish(dish, restaurantId, oldDish) {
         restaurantId: restaurantId,
         name: sanitizer.sanitize.keepUnicode(dish.name),
         category: dish.category,
-        price: dish.price,
+        prices: dish.prices,
         notes: sanitizer.sanitize.keepUnicode(dish.notes),
         imgUrl: img,
         weight: dish.weight,
@@ -149,7 +149,7 @@ async function createDish(dish, restaurantId, oldDish) {
         restaurantId: oldDish.restaurantId,
         name: sanitizer.sanitize.keepUnicode(dish.name),
         category: dish.category,
-        price: dish.price,
+        prices: dish.prices,
         notes: sanitizer.sanitize.keepUnicode(dish.notes),
         imgUrl: img,
         weight: dish.weight,
@@ -164,7 +164,7 @@ async function createDish(dish, restaurantId, oldDish) {
     }
   } catch (e) {
     console.log(e);
-    throw newError("Cannot create dish", 500);
+    throw newError("Cannot create dish because: " + e, 500);
   }
 }
 

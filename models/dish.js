@@ -13,12 +13,11 @@ const dishSchema = mongoose.Schema({
     maxlength: 64,
     required: true,
   },
-  prices: [
-    {
+  prices: {
+    price1: {
       priceName: {
         type: String,
         maxlength: 60,
-        required: true
       },
       price: {
         type: String,
@@ -26,7 +25,27 @@ const dishSchema = mongoose.Schema({
         required: true
       }
     },
-  ],
+    price2: {
+      priceName: {
+        type: String,
+        maxlength: 60,
+      },
+      price: {
+        type: String,
+        maxlength: 20,
+      }
+    },
+    price3: {
+      priceName: {
+        type: String,
+        maxlength: 60,
+      },
+      price: {
+        type: String,
+        maxlength: 20,
+      }
+    }
+  },
   notes: {
     type: String,
     maxlength: 200,

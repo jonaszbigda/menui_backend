@@ -1,7 +1,7 @@
 const express = require("express");
 const { validateUserToken, handleError } = require("../services/services.js");
-const { uploadBlob } = require("../services/azureServices.js");
-// Azure
+const { uploadBlob } = require("../services/oceanServices.js");
+// FileStorage
 const multer = require("multer");
 
 var router = express.Router();

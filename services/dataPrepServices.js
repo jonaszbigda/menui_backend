@@ -5,7 +5,7 @@ const Dish = require("../models/dish.js");
 const User = require("../models/users.js");
 const Restaurant = require("../models/restaurant.js");
 const { fetchMultipleRestaurants } = require("./databaseServices.js");
-const { deleteImage } = require("./azureServices.js");
+const { deleteImage } = require("./oceanServices.js");
 
 async function createUser(request) {
   const password = await hashPass(request.body.password);

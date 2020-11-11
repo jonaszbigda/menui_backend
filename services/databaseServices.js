@@ -2,7 +2,7 @@ const Restaurant = require("../models/restaurant.js");
 const Dish = require("../models/dish.js");
 const User = require("../models/users.js");
 const Payments = require("../models/payments.js");
-const { deleteImage } = require("./azureServices.js");
+const { deleteImage } = require("./oceanServices.js");
 const {
   appendDishToLunchSet,
   removeDishFromLunchSet,

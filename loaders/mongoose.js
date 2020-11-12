@@ -10,6 +10,7 @@ const loadMongoose = async () => {
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useFindAndModify: false
     },
     (err) => {
       if (err) console.log("Unable to connect :(");

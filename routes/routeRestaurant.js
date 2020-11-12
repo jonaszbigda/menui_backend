@@ -9,8 +9,9 @@ const {
   changeLunchMenu,
   changeLunchMenuSet,
   fetchUser,
-  initializePayment,
   renewSubscription,
+  setRestaurantVisibility,
+  startTrial
 } = require("../services/databaseServices.js");
 const {
   decodeAndSanitize,
@@ -161,6 +162,21 @@ router.post("/delete", async (req, res) => {
   }
 });
 
+// SET RESTAURANT VISIBILITY
+
+router.post("/visibility", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = await validateUserToken(token);
+    await validateRestaurant(req.body.restaurantId);
+    await verifyRestaurantAccess(req.body.restaurantId, user);
+    await setRestaurantVisibility(req.body.restaurantId, req.body.visible);
+    res.send("Widoczność restauracji została zmieniona.");
+  } catch (error) {
+    handleError(error, res);
+  }
+})
+
 // ACTIVATE SUBSCRIPTION
 
 router.post("/subscription", async (req, res) => {
@@ -174,10 +190,23 @@ router.post("/subscription", async (req, res) => {
       req.body.type
     ); */
     await renewSubscription(req.body.restaurantId, req.body.type);
-    res.send(200);
+    res.sendStatus(200);
   } catch (error) {
     handleError(error, res);
   }
 });
+
+// ACTIVATE TRIAL
+
+router.post("/trial", async (req, res) => {
+  try {
+    const token = req.headers["x-auth-token"];
+    const user = validateUserToken(token);
+    await startTrial(req.body.restaurantId, user);
+    res.send("Trial aktywowany.");
+  } catch (error) {
+    handleError(error, res);
+  }
+})
 
 module.exports = router;

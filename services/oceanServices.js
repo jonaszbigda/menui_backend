@@ -18,7 +18,8 @@ async function renameBlob(blobURL) {
         const key = blobURL.replace(containerURL, "");
         s3.copyObject({
             CopySource: "menuicdn/" + key,
-            Bucket: "menuicdn",
+          Bucket: "menuicdn",
+            ACL: 'public-read',
             Key: removePrefix(key)
         }, (err) => {
                 if (err) {

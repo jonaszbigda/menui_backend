@@ -121,6 +121,30 @@ async function renewSubscription(restaurantId, monthsToAdd) {
   return dueDateBasedOnSubscription(restaurant, monthsToAdd);
 }
 
+async function startTrial(restaurantId, userData) {
+  const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
+    throw newError("Nie udało się pobrać restauracji.", 404);
+  });
+  if (!userData.trialUsed || userData.trialUsed === false) {
+    const dueDate = dueDateBasedOnSubscription(restaurant, monthsToAdd);
+    const start = startDate(restaurant);
+    await Restaurant.findByIdAndUpdate(restaurantId, {
+    $set: {
+      subscriptionActive: true,
+      subscriptionDue: dueDate,
+      subscriptionStarted: start,
+    },
+    }).catch((e) => {
+    throw newError(
+      "Nie udało się aktywować okresu próbnego.",
+      500
+    );
+    });
+  } else {
+    throw newError("Okres próbny został już wykorzystany.", 500);
+  }
+}
+
 async function checkIfCategoryExists(restaurant, category) {
   const categories = restaurant.categories;
   if (categories.includes(category)) {
@@ -241,6 +265,7 @@ async function fetchRestaurant(id) {
   const data = await Restaurant.findById(id).catch((e) => {
     throw newError("Nie udało się pobrać restauracji.", 500);
   });
+  console.log("fetched restaurant");
   return data;
 }
 
@@ -254,11 +279,8 @@ async function fetchMultipleRestaurants(idArray) {
 }
 
 async function fetchAllDishesForRestaurant(restaurant) {
-  let dishes = [];
-  for (const dish of restaurant.dishes) {
-    let res = await fetchDish(dish._id);
-    if (res !== null) dishes.push(res);
-  }
+  const idList = restaurant.dishes;
+  const dishes = await Dish.find({ '_id': { $in: idList } });
   return dishes;
 }
 
@@ -337,6 +359,14 @@ async function initializePayment(restaurantId, userData, type) {
   return payment;
 }
 
+async function setRestaurantVisibility(restaurantId, visible) {
+  await Restaurant.findByIdAndUpdate(restaurantId, { $set: { hidden: !visible } }).catch(
+    (e) => {
+      throw newError("Nie udało się zmienić dania.", 500);
+    }
+  );
+}
+
 exports.changeUserPass = changeUserPass;
 exports.removeDish = removeDish;
 exports.removeRestaurant = removeRestaurant;
@@ -353,3 +383,5 @@ exports.fetchAllDishesForRestaurant = fetchAllDishesForRestaurant;
 exports.fetchDish = fetchDish;
 exports.fetchUser = fetchUser;
 exports.initializePayment = initializePayment;
+exports.setRestaurantVisibility = setRestaurantVisibility;
+exports.startTrial = startTrial;

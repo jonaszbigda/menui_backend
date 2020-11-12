@@ -166,6 +166,22 @@
 
     <br>
 
+- ### **/restaurant/visibility**
+
+  - #### **POST**
+
+    Takes a **restaurantId, visible** parameters and a **JWT token(header)**, and tries to set restaurant visibility.
+
+    <br>
+
+- ### **/restaurant/trial**
+
+  - #### **POST**
+
+    Takes a **restaurantId** parameters and a **JWT token(header)**, and tries to activate trial (if not already used).
+
+    <br>
+
 * ### **/img**
 
   - #### **POST**

@@ -15,6 +15,8 @@ const {
   checkEmailTaken,
   validateUserToken,
   hashPass,
+  generateRefreshToken,
+  validateRefreshToken,
 } = require("../services/services.js");
 const { resetPassword } = require("../services/mailServices.js");
 
@@ -30,11 +32,22 @@ router.post("/login", async (req, res) => {
     await checkPassword(req.body.password, user.password);
     const safeUser = await prepareSafeUser(user);
     var token = generateAuthToken(safeUser);
-    res.header("x-auth-token", token).status(202).send(safeUser);
+    var refreshToken = generateRefreshToken(user._id);
+    res.header("x-auth-token", token).header("ref", refreshToken).status(202).send(safeUser);
   } catch (error) {
     handleError(error, res);
   }
 });
+
+//REFRESH_TOKEN
+router.post("refreshtoken", async (req, res) => {
+  try {
+    const refreshToken = req.headers["ref"];
+    validateRefreshToken(refreshToken);
+  } catch (error) {
+    handleError(error, res);
+  }
+})
 
 // REFRESH
 router.post("/refresh", async (req, res) => {

@@ -54,8 +54,17 @@ function generateAuthToken(user) {
       restaurants: user.restaurants,
     },
     jwtSecret,
-    { expiresIn: "1h" }
+    { expiresIn: "15m" }
   );
+  return token;
+}
+
+function generateRefreshToken(userId) {
+  const token = jwt.sign({
+    id: userId
+  }, jwtSecret, {
+    expiresIn: "1h"
+  });
   return token;
 }
 
@@ -88,6 +97,17 @@ async function checkEmailTaken(email) {
 }
 
 function validateUserToken(token) {
+  if (!token) throw newError("Brak dostępu", 401);
+  try {
+    const verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
+    if (!verified) throw newError("Brak dostępu", 401);
+    return verified;
+  } catch (error) {
+    throw newError("Brak dostępu", 401);
+  }
+}
+
+function validateRefreshToken(token) {
   if (!token) throw newError("Brak dostępu", 401);
   try {
     const verified = jwt.verify(token, jwtSecret, { ignoreExpiration: false });
@@ -174,3 +194,5 @@ exports.verifyRestaurantAccess = verifyRestaurantAccess;
 exports.yearFromNowDate = yearFromNowDate;
 exports.hashPass = hashPass;
 exports.saveImage = saveImage;
+exports.generateRefreshToken = generateRefreshToken;
+exports.validateRefreshToken = validateRefreshToken;

@@ -198,6 +198,14 @@
 
     <br>
 
+- ### **/user/refreshtoken**
+
+  - #### **POST**
+
+    Takes no parameters as it reads the **refreshToken** from a cookie. If refresh token is valid, then returns new auth token in a header and sets new refresh token cookie. **500** on error.
+
+    <br>
+
 * ### **/user/register**
 
   - #### **POST**

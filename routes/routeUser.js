@@ -19,6 +19,7 @@ const {
   validateRefreshToken,
 } = require("../services/services.js");
 const { resetPassword } = require("../services/mailServices.js");
+const cookie = require("cookie");
 
 var router = express.Router();
 
@@ -32,18 +33,25 @@ router.post("/login", async (req, res) => {
     await checkPassword(req.body.password, user.password);
     const safeUser = await prepareSafeUser(user);
     var token = generateAuthToken(safeUser);
-    var refreshToken = generateRefreshToken(user._id);
-    res.header("x-auth-token", token).header("ref", refreshToken).status(202).send(safeUser);
+    var refreshToken = generateRefreshToken(user);
+    res.header("x-auth-token", token)
+    .header("Set-Cookie", cookie.serialize("refreshToken", refreshToken, { httpOnly: true }))
+    .status(202).send(safeUser);
   } catch (error) {
     handleError(error, res);
   }
 });
 
 //REFRESH_TOKEN
-router.post("refreshtoken", async (req, res) => {
+router.post("/refreshtoken", async (req, res) => {
   try {
-    const refreshToken = req.headers["ref"];
-    validateRefreshToken(refreshToken);
+    const cookies = cookie.parse(req.headers.cookie);
+    const user = validateRefreshToken(cookies.refreshToken);
+    const newAccessToken = generateAuthToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+    res.header("x-auth-token", newAccessToken)
+    .header("Set-Cookie", cookie.serialize("refreshToken", newRefreshToken, { httpOnly: true }))
+    .status(202).send("Auth token refreshed.");
   } catch (error) {
     handleError(error, res);
   }

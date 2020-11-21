@@ -47,11 +47,7 @@ function generateAuthToken(user) {
   const token = jwt.sign(
     {
       email: user.email,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      billing: user.billing,
       id: user.id,
-      restaurants: user.restaurants,
     },
     jwtSecret,
     { expiresIn: "15m" }
@@ -59,9 +55,10 @@ function generateAuthToken(user) {
   return token;
 }
 
-function generateRefreshToken(userId) {
+function generateRefreshToken(user) {
   const token = jwt.sign({
-    id: userId
+      email: user.email,
+      id: user.id,
   }, jwtSecret, {
     expiresIn: "1h"
   });

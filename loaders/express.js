@@ -12,11 +12,11 @@ const routeHealth = require("../routes/routeHealth.js");
 
 const loadExpress = ({ app, secret }) => {
   const limiter = rateLimiter({
-    windowMs: 15 * 60 * 1000, //time window
+    windowMs: 10 * 60 * 1000, //time window
     max: 100, //requests = a single IP for a time window
   });
 
-  app.use(cors({ exposedHeaders: "x-auth-token", origin: true }));
+  app.use(cors({ exposedHeaders: "x-auth-token", origin: true, credentials: true }));
   app.use(helmet());
   app.use(limiter);
   app.use(bodyParser.json({ limit: "100kb" })); // limit JSON body payload size

@@ -1,5 +1,5 @@
 const express = require("express");
-const { validateUserToken, handleError } = require("../services/services.js");
+const { validateUserToken, handleError, newError } = require("../services/services.js");
 const { uploadBlob } = require("../services/oceanServices.js");
 // FileStorage
 const multer = require("multer");
@@ -14,17 +14,26 @@ const uploadStrategy = multer({
     }
     cb(null, true);
   },
-  limits: { fileSize: 2000000 },
+  limits: { fileSize: 2000000 }
 }).single("menuiImage");
 
 // POST
 
-router.post("/", uploadStrategy, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const token = req.headers["x-auth-token"];
-    validateUserToken(token);
-    await uploadBlob(req, res);
+    await uploadStrategy(req, res, async (err) => {
+      if(err){
+        if(err.code === "LIMIT_FILE_SIZE"){
+          throw newError("error", 413);
+        }
+      } else {
+        const token = req.headers["x-auth-token"];
+        validateUserToken(token);
+        await uploadBlob(req, res);
+      }
+    })
   } catch (error) {
+    console.log("error:   " + error)
     handleError(error, res);
   }
 });

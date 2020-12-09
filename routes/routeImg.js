@@ -19,23 +19,24 @@ const uploadStrategy = multer({
 
 // POST
 
-router.post("/", async (req, res) => {
-  try {
-    await uploadStrategy(req, res, async (err) => {
-      if(err){
-        if(err.code === "LIMIT_FILE_SIZE"){
-          throw newError("error", 413);
+router.post("/", (req, res) => {
+    uploadStrategy(req, res, async (err) => {
+      if (err) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          handleError(newError("File too big", 413), res);
+        } else {
+          handleError(newError("Unknown error...", 500), res);
         }
       } else {
-        const token = req.headers["x-auth-token"];
-        validateUserToken(token);
-        await uploadBlob(req, res);
+        try {
+          const token = req.headers["x-auth-token"];
+          validateUserToken(token);
+          await uploadBlob(req, res);
+        } catch (error) {
+          handleError(error, res)
+        }
       }
     })
-  } catch (error) {
-    console.log("error:   " + error)
-    handleError(error, res);
-  }
 });
 
 module.exports = router;

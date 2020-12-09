@@ -203,7 +203,7 @@ router.post("/trial", async (req, res) => {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
     await startTrial(req.body.restaurantId, user);
-    res.send("Trial aktywowany.");
+    res.send("Okres próbny aktywowany.");
   } catch (error) {
     handleError(error, res);
   }

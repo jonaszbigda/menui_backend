@@ -126,7 +126,7 @@ async function startTrial(restaurantId, userData) {
     throw newError("Nie udało się pobrać restauracji.", 404);
   });
   if (!userData.trialUsed || userData.trialUsed === false) {
-    const dueDate = dueDateBasedOnSubscription(restaurant, monthsToAdd);
+    const dueDate = dueDateBasedOnSubscription(restaurant, 3);
     const start = startDate(restaurant);
     await Restaurant.findByIdAndUpdate(restaurantId, {
     $set: {
@@ -140,6 +140,9 @@ async function startTrial(restaurantId, userData) {
       500
     );
     });
+    await User.findByIdAndUpdate(userData.id, { $set: { trialUsed: true } }).catch((e) => {
+      throw newError("Błąd podczas aktywacji okresu próbnego (user data)")
+    })
   } else {
     throw newError("Okres próbny został już wykorzystany.", 500);
   }

@@ -53,7 +53,7 @@
 - ##### **lunchMenu**:
   - ##### **lunchSetName**: _String_
   - ##### **lunchSetPrice**: _String_
-  - ##### **lunchSetDishes**: [mongoose.Types.ObjectId]
+  - ##### **lunchSetDishes**: [{ dishId: mongoose.Types.ObjectId, quantity: String }]
 - ##### **dishes**: [*mongoose.Types.ObjectId*]
 
 <br>

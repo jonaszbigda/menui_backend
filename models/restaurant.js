@@ -70,7 +70,10 @@ const restaurantSchema = mongoose.Schema({
     {
       lunchSetName: String,
       lunchSetPrice: String,
-      lunchSetDishes: [mongoose.Types.ObjectId],
+      lunchSetDishes: [{
+        dishId: mongoose.Types.ObjectId,
+        quantity: String
+      }],
     },
   ],
   dishes: [mongoose.Types.ObjectId],

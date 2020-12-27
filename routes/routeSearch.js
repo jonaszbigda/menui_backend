@@ -84,8 +84,12 @@ router.get("/autocomplete/", (req, res) => {
           res.sendStatus(404);
         } else {
           doc.forEach((value) => {
-            cities.add(value.city);
-            restaurants.add(value.name);
+            if(value.city.search(regex) !== -1){
+              cities.add(value.city);
+            }
+            if(value.name.search(regex) !== -1){
+              restaurants.add(value.name);
+            }
           });
           res.send({
             cities: Array.from(cities),
@@ -93,7 +97,7 @@ router.get("/autocomplete/", (req, res) => {
           });
         }
       }
-    ).limit(5);
+    ).limit(10);
   } else {
     res.send({
       cities: [],

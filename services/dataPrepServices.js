@@ -168,11 +168,15 @@ async function createDish(dish, restaurantId, oldDish) {
   }
 }
 
-function appendDishToLunchSet(lunchMenu, setName, dishId) {
+function appendDishToLunchSet(lunchMenu, setName, dishId, quantity) {
   const result = lunchMenu.map((lunchSet) => {
     if (lunchSet.lunchSetName === setName) {
       let updatedSet = lunchSet;
-      updatedSet.lunchSetDishes.push(dishId);
+      let dishToAdd = {
+        dishId: dishId,
+        quantity: quantity
+      }
+      updatedSet.lunchSetDishes.push(dishToAdd);
       return updatedSet;
     } else {
       return lunchSet;
@@ -185,9 +189,9 @@ function removeDishFromLunchSet(lunchMenu, setName, dishId) {
   const result = lunchMenu.map((lunchSet) => {
     if (lunchSet.lunchSetName === setName) {
       let updatedSet = lunchSet;
-      const dishIndex = updatedSet.lunchSetDishes.indexOf(dishId);
-      if (dishIndex > -1) {
-        updatedSet.lunchSetDishes.splice(dishIndex, 1);
+      const index = updatedSet.lunchSetDishes.findIndex(dish => dish.dishId === dishId);
+      if (index > -1) {
+        updatedSet.lunchSetDishes.splice(index, 1);
       }
       return updatedSet;
     } else {

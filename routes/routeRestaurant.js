@@ -134,6 +134,7 @@ router.post("/lunch", async (req, res) => {
       req.body.restaurantId,
       req.body.setName,
       req.body.dishId,
+      req.body.quantity,
       req.body.action
     );
     res.sendStatus(200);

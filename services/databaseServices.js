@@ -229,7 +229,7 @@ async function changeLunchMenuSet(restaurantId, action, lunchSet) {
   }
 }
 
-async function changeLunchMenu(restaurantId, setName, dishId, action) {
+async function changeLunchMenu(restaurantId, setName, dishId, quantity, action) {
   if (action === "add") {
     const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
       throw newError("Nie udało się pobrać restauracji.", 404);
@@ -238,7 +238,8 @@ async function changeLunchMenu(restaurantId, setName, dishId, action) {
     const updatedLunchMenu = appendDishToLunchSet(
       restaurant.lunchMenu,
       setName,
-      dishId
+      dishId, 
+      quantity
     );
     await Restaurant.findByIdAndUpdate(restaurantId, {
       $set: { lunchMenu: updatedLunchMenu },

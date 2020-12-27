@@ -65,8 +65,9 @@ function removePrefix(string) {
 }
 
 function makeTempBlobName(originalName) {
+  const trimmedName = originalName.replace(/\s/g, '');
   const identifier = Math.random().toString().replace(/0\./, "");
-  return `TEMP_${identifier}-${originalName}`;
+  return `TEMP_${identifier}-${trimmedName}`;
 }
 
 function setDeleteTempBlobTimer(blobName, minutes) {

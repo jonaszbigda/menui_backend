@@ -57,7 +57,7 @@ router.get("/location", async (req, res) => {
       coordinates: [req.query.lon, req.query.lat],
       type: "Point",
     };
-    const radius = parseInt(req.query.radius) * 1000;
+    const radius = parseInt(req.query.radius);
     const results = await Restaurant.find({
       location: { $near: { $maxDistance: radius, $geometry: location } },
     });

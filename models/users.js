@@ -13,18 +13,18 @@ const userSchema = mongoose.Schema({
   firstname: {
     type: String,
     required: true,
-    maxlength: 64,
+    maxlength: 24,
   },
   lastname: {
     type: String,
     required: true,
-    maxlength: 64,
+    maxlength: 24,
   },
   billing: {
     NIP: {
       type: String,
       required: true,
-      maxlength: 64,
+      maxlength: 20,
     },
     adress: {
       type: String,

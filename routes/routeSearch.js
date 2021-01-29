@@ -2,6 +2,7 @@ const express = require("express");
 const Restaurant = require("../models/restaurant.js");
 const sanitizer = require("string-sanitizer");
 const { handleError } = require("../services/services.js");
+const { validateSearch } = require("../services/validations.js");
 
 var router = express.Router();
 
@@ -11,6 +12,7 @@ router.get("/", async (req, res) => {
   try {
     if (req.query.string.length > 0) {
       const query = sanitizer.sanitize.keepUnicode(decodeURI(req.query.string));
+      validateSearch(query);
       const regex = new RegExp(query, "i");
 
       Restaurant.find(
@@ -43,12 +45,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// TEST
-
-router.get("/test/", (req, res) => {
-  res.send(req.query.string);
-});
-
 // SEARCH RESTAURANTS BY LOCATION
 
 router.get("/location", async (req, res) => {
@@ -72,12 +68,17 @@ router.get("/location", async (req, res) => {
 router.get("/autocomplete/", (req, res) => {
   if (req.query.string.length > 0) {
     var query = sanitizer.sanitize.keepUnicode(decodeURI(req.query.string));
+    validateSearch(query);
     const regex = new RegExp(query, "i");
     let cities = new Set();
     let restaurants = new Set();
 
     Restaurant.find(
-      { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
+      { $and: [
+        { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
+        { $or: [{ hidden: false }, { hidden: { $exists: false } }] },
+        { subscriptionActive: true },
+      ], },
       "name city",
       (err, doc) => {
         if (err) {

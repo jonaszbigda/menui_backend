@@ -12,33 +12,40 @@ const userSchema = mongoose.Schema({
   },
   firstname: {
     type: String,
-    required: true,
     maxlength: 24,
   },
   lastname: {
     type: String,
-    required: true,
     maxlength: 24,
+  },
+  login: {
+    type: String,
+    maxlength: 64
   },
   billing: {
     NIP: {
       type: String,
-      required: true,
       maxlength: 20,
     },
     adress: {
       type: String,
-      required: true,
       maxlength: 128,
     },
     companyName: {
       type: String,
-      required: true,
       maxlength: 64,
     },
   },
+  isRestaurant: Boolean,
   restaurants: [mongoose.Types.ObjectId],
   trialUsed: Boolean,
+  preferences: {
+    excludeAllergens: [String],
+    vegetarian: Boolean,
+    vegan: Boolean,
+  },
+  favoriteRestaurants: [mongoose.Types.ObjectId],
+  photos: [mongoose.Types.ObjectId]
 });
 
 module.exports = mongoose.model("User", userSchema);

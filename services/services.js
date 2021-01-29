@@ -160,7 +160,7 @@ function yearFromNowDate() {
 
 async function hashPass(pass) {
   if (pass.length < 6) {
-    throw newError("Hasło za krótkie.", 500);
+    throw newError("Hasło za krótkie.", 400);
   }
   try {
     const salt = await bcrypt.genSalt(10);

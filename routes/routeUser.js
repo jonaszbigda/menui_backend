@@ -20,6 +20,7 @@ const {
 } = require("../services/services.js");
 const { resetPassword } = require("../services/mailServices.js");
 const cookie = require("cookie");
+const { validateLogin, validateRegister, validatePassword } = require("../services/validations.js");
 
 var router = express.Router();
 
@@ -29,6 +30,7 @@ router.post("/login", async (req, res) => {
     if (!req.body.password || !req.body.email) {
       throw newError("Niepełne dane.", 204);
     }
+    validateLogin(req.body);
     const user = await fetchUser(req.body.email);
     await checkPassword(req.body.password, user.password);
     const safeUser = await prepareSafeUser(user);
@@ -73,6 +75,7 @@ router.post("/refresh", async (req, res) => {
 // REGISTER
 router.post("/register", async (req, res) => {
   try {
+    validateRegister(req.body);
     await checkEmailTaken(req.body.email);
     const user = await createUser(req);
     await user.save().catch((e) => {
@@ -90,6 +93,7 @@ router.post("/changepass", async (req, res) => {
     if (!req.body.password || !req.body.email || !req.body.newPass) {
       throw newError("Niepełne dane.", 204);
     }
+    validateLogin(req.body);
     const token = req.headers["x-auth-token"];
     validateUserToken(token);
     const user = await fetchUser(req.body.email);
@@ -117,8 +121,9 @@ router.post("/forgotpassword", async (req, res) => {
 // RESET PASS
 router.post("/resetpass", async (req, res) => {
   try {
-    validateUserToken(req.body.token);
-    const user = await fetchUser(req.body.email);
+    decodedToken = validateUserToken(req.body.token);
+    validatePassword(req.body.newPass)
+    const user = await fetchUser(decodedToken.email);
     const newPassword = await hashPass(req.body.newPass);
     await changeUserPass(user._id, newPassword);
     res.send("Hasło zostało zmienione.");

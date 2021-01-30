@@ -23,6 +23,7 @@ const {
   checkPassword,
 } = require("../services/services.js");
 const Restaurant = require("../models/restaurant.js");
+const { validateRestaurant } = require("../services/validations.js");
 
 var router = express.Router();
 
@@ -44,6 +45,7 @@ router.post("/", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
+    validateRestaurant(req.body);
     const restaurant = await createRestaurant(req.body).catch((err) => {
       throw newError("Nie udało się zapisać zdjęcia.", 500);
     });

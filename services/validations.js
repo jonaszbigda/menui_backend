@@ -36,10 +36,18 @@ const validateRegister = function(requestBody){
 }
 
 const validateSearch = function(string){
-    const valid = validator.isLength(string, { max: 64 }) && validator.isAlphanumeric(string)
+    const decodedString = decodeURI(string);
+    const valid = validator.isLength(decodedString, { max: 64 })
     if(!valid){
         throw newError("Niepoprawne zapytanie", 400)
     }
+}
+
+const validateRestaurant = function(requestBody){
+    const name = validator.isLength(requestBody.name, { max: 64 })
+    const city = validator.isLength(requestBody.city, { max: 64 })
+    const adress = validator.isLength(requestBody.adress, { max: 64 })
+    const imgURL = validator.isURL(requestBody.imgUrl) && validator.contains(requestBody.imgUrl, "https://menuicdn.fra1.digitaloceanspaces.com/")
 }
 
 // EXPORTS
@@ -48,3 +56,4 @@ exports.validateLogin = validateLogin;
 exports.validateRegister = validateRegister;
 exports.validatePassword = validatePassword;
 exports.validateSearch = validateSearch;
+exports.validateRestaurant = validateRestaurant;

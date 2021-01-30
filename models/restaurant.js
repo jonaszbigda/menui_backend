@@ -4,17 +4,17 @@ const restaurantSchema = mongoose.Schema({
   _id: mongoose.Types.ObjectId,
   name: {
     type: String,
-    maxlength: 128,
+    maxlength: 64,
     required: true,
   },
   city: {
     type: String,
-    maxlength: 128,
+    maxlength: 64,
     required: true,
   },
   adress: {
     type: String,
-    maxlength: 128,
+    maxlength: 64,
     required: true,
   },
   location: {
@@ -28,22 +28,52 @@ const restaurantSchema = mongoose.Schema({
       required: true,
     },
   },
-  type: String,
-  placesId: String,
+  type: {
+    type: String,
+    maxlength: 64,
+    required: true
+  },
+  placesId: {
+    type: String,
+    maxlength: 128
+  },
   imgUrl: {
     type: String,
+    maxlength: 128
   },
   workingHours: {
-    pn: String,
-    wt: String,
-    sr: String,
-    cz: String,
-    pt: String,
-    sb: String,
-    nd: String,
+    pn: {
+      type: String,
+      maxlength: 24
+    },
+    wt: {
+      type: String,
+      maxlength: 24
+    },
+    sr: {
+      type: String,
+      maxlength: 24
+    },
+    cz: {
+      type: String,
+      maxlength: 24
+    },
+    pt: {
+      type: String,
+      maxlength: 24
+    },
+    sb: {
+      type: String,
+      maxlength: 24
+    },
+    nd: {
+      type: String,
+      maxlength: 24
+    },
   },
   description: {
     type: String,
+    maxlength: 400
   },
   tags: {
     cardPayments: Boolean,
@@ -55,25 +85,43 @@ const restaurantSchema = mongoose.Schema({
     delivery: Boolean,
   },
   links: {
-    facebook: String,
-    instagram: String,
-    www: String,
+    facebook: {
+      type: String,
+      maxlength: 128
+    },
+    instagram: {
+      type: String,
+      maxlength: 128
+    },
+    www: {
+      type: String,
+      maxlength: 128
+    },
   },
-  phone: String,
+  phone: {
+    type: String,
+    maxlength: 24
+  },
   hidden: Boolean,
   subscriptionActive: Boolean,
   subscriptionStarted: Date,
   subscriptionDue: Date,
   indexed: Date,
   categories: [String],
-  lunchHours: String,
+  lunchHours: {
+    type: String,
+    maxlength: 24
+  },
   lunchMenu: [
     {
-      lunchSetName: String,
-      lunchSetPrice: String,
+      lunchSetName: {
+        type: String,
+        maxlength: 30
+      },
+      lunchSetPrice: Number,
       lunchSetDishes: [{
         dishId: mongoose.Types.ObjectId,
-        quantity: String
+        quantity: Number
       }],
     },
   ],

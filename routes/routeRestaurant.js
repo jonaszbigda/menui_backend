@@ -23,7 +23,7 @@ const {
   checkPassword,
 } = require("../services/services.js");
 const Restaurant = require("../models/restaurant.js");
-const { validateRestaurant } = require("../services/validations.js");
+const { validateRestaurantData, validateLunchSet } = require("../services/validations.js");
 
 var router = express.Router();
 
@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
-    validateRestaurant(req.body);
+    validateRestaurantData(req.body);
     const restaurant = await createRestaurant(req.body).catch((err) => {
       throw newError("Nie udało się zapisać zdjęcia.", 500);
     });
@@ -63,6 +63,7 @@ router.put("/", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
+    validateRestaurantData(req.body);
     const oldRestaurant = await fetchRestaurant(req.body.restaurantId);
     const newRestaurant = await createRestaurant(req.body, oldRestaurant);
     await verifyRestaurantAccess(req.body.restaurantId, user);
@@ -113,6 +114,7 @@ router.post("/lunchSet", async (req, res) => {
   try {
     const token = req.headers["x-auth-token"];
     const user = validateUserToken(token);
+    validateLunchSet(req.body.set);
     await validateRestaurant(req.body.restaurantId);
     await verifyRestaurantAccess(req.body.restaurantId, user);
     await changeLunchMenuSet(

@@ -43,11 +43,25 @@ const validateSearch = function(string){
     }
 }
 
-const validateRestaurant = function(requestBody){
+const validateRestaurantData = function(requestBody){
     const name = validator.isLength(requestBody.name, { max: 64 })
     const city = validator.isLength(requestBody.city, { max: 64 })
     const adress = validator.isLength(requestBody.adress, { max: 64 })
-    const imgURL = validator.isURL(requestBody.imgUrl) && validator.contains(requestBody.imgUrl, "https://menuicdn.fra1.digitaloceanspaces.com/")
+    const type = validator.isLength(requestBody.type, { max: 64 })
+    const description = true;
+    if(requestBody.description){
+        description = validator.isLength(requestBody.description, { max: 400 })
+    }
+    if(!name || !city || !adress || !type || !description){
+        throw newError("Dane nieprawidłowe", 400)
+    }
+}
+
+const validateLunchSet = function(set){
+    const name = validator.isLength(set.lunchSetName, { min: 2, max: 64 })
+    if(!name){
+        throw newError("Nieprawidłowe dane", 400)
+    }
 }
 
 // EXPORTS
@@ -56,4 +70,5 @@ exports.validateLogin = validateLogin;
 exports.validateRegister = validateRegister;
 exports.validatePassword = validatePassword;
 exports.validateSearch = validateSearch;
-exports.validateRestaurant = validateRestaurant;
+exports.validateRestaurantData = validateRestaurantData;
+exports.validateLunchSet = validateLunchSet;

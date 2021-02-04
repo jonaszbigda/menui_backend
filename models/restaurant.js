@@ -39,7 +39,8 @@ const restaurantSchema = mongoose.Schema({
   },
   imgUrl: {
     type: String,
-    maxlength: 128
+    maxlength: 128,
+    required: true
   },
   workingHours: {
     pn: {

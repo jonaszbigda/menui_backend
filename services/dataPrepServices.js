@@ -1,5 +1,4 @@
 const { hashPass, newError, saveImage } = require("./services.js");
-const sanitizer = require("string-sanitizer");
 const mongoose = require("mongoose");
 const Dish = require("../models/dish.js");
 const User = require("../models/users.js");
@@ -53,9 +52,9 @@ async function createRestaurant(request, oldRestaurant) {
       const img = await handleImageUpdate(request);
       const restaurant = new Restaurant({
         _id: new mongoose.Types.ObjectId(),
-        name: sanitizer.sanitize.keepUnicode(request.name),
-        city: sanitizer.sanitize.keepUnicode(request.city),
-        adress: sanitizer.sanitize.keepUnicode(request.adress),
+        name: request.name,
+        city: request.city,
+        adress: request.adress,
         location: {
           type: "Point",
           coordinates: request.coordinates,
@@ -65,7 +64,7 @@ async function createRestaurant(request, oldRestaurant) {
         imgUrl: img,
         workingHours: request.workingHours,
         lunchHours: request.lunchHours,
-        description: sanitizer.sanitize.keepUnicode(request.description),
+        description: request.description,
         tags: request.tags,
         links: request.links,
         phone: request.phone,
@@ -75,10 +74,11 @@ async function createRestaurant(request, oldRestaurant) {
     } else {
       const img = await handleImageUpdate(request, oldRestaurant);
       const restaurant = new Restaurant({
-        name: sanitizer.sanitize.keepUnicode(request.name),
-        city: sanitizer.sanitize.keepUnicode(request.city),
+        _id: oldRestaurant._id,
+        name: request.name,
+        city: request.city,
         dishes: oldRestaurant.dishes,
-        adress: sanitizer.sanitize.keepUnicode(request.adress),
+        adress: request.adress,
         location: {
           type: "Point",
           coordinates: request.coordinates,
@@ -90,7 +90,7 @@ async function createRestaurant(request, oldRestaurant) {
         lunchHours: request.lunchHours,
         lunchMenu: oldRestaurant.lunchMenu,
         categories: oldRestaurant.categories,
-        description: sanitizer.sanitize.keepUnicode(request.description),
+        description: request.description,
         tags: request.tags,
         links: request.links,
         phone: request.phone,
@@ -129,10 +129,10 @@ async function createDish(dish, restaurantId, oldDish) {
       const newDish = new Dish({
         _id: new mongoose.Types.ObjectId(),
         restaurantId: restaurantId,
-        name: sanitizer.sanitize.keepUnicode(dish.name),
+        name: dish.name,
         category: dish.category,
         prices: dish.prices,
-        notes: sanitizer.sanitize.keepUnicode(dish.notes),
+        notes: dish.notes,
         imgUrl: img,
         weight: dish.weight,
         allergens: dish.allergens,
@@ -147,10 +147,10 @@ async function createDish(dish, restaurantId, oldDish) {
       const img = await handleImageUpdate(dish, oldDish);
       const newDish = new Dish({
         restaurantId: oldDish.restaurantId,
-        name: sanitizer.sanitize.keepUnicode(dish.name),
+        name: dish.name,
         category: dish.category,
         prices: dish.prices,
-        notes: sanitizer.sanitize.keepUnicode(dish.notes),
+        notes: dish.notes,
         imgUrl: img,
         weight: dish.weight,
         allergens: dish.allergens,

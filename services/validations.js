@@ -48,7 +48,7 @@ const validateRestaurantData = function(requestBody){
     const city = validator.isLength(requestBody.city, { max: 64 })
     const adress = validator.isLength(requestBody.adress, { max: 64 })
     const type = validator.isLength(requestBody.type, { max: 64 })
-    const description = true;
+    let description = true;
     if(requestBody.description){
         description = validator.isLength(requestBody.description, { max: 400 })
     }

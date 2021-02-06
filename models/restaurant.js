@@ -127,6 +127,13 @@ const restaurantSchema = mongoose.Schema({
     },
   ],
   dishes: [mongoose.Types.ObjectId],
+  ratings: [
+    {
+      rate: Number,
+      owner: mongoose.Types.ObjectId,
+      id: mongoose.Types.ObjectId
+    }
+  ]
 });
 
 module.exports = mongoose.model("Restaurant", restaurantSchema);

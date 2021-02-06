@@ -169,6 +169,7 @@ async function createDish(dish, restaurantId, oldDish) {
 }
 
 function appendDishToLunchSet(lunchMenu, setName, dishId, quantity) {
+  console.log("append called")
   const result = lunchMenu.map((lunchSet) => {
     if (lunchSet.lunchSetName === setName) {
       let updatedSet = lunchSet;

@@ -70,6 +70,14 @@ const dishSchema = mongoose.Schema({
   kCal: String,
   vegan: Boolean,
   vegetarian: Boolean,
+  photos: [mongoose.Types.ObjectId],
+  ratings: [
+    {
+      id: mongoose.Types.ObjectId,
+      rate: Number,
+      owner: mongoose.Types.ObjectId
+    }
+  ]
 });
 
 module.exports = mongoose.model("Dish", dishSchema);

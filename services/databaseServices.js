@@ -3,10 +3,6 @@ const Dish = require("../models/dish.js");
 const User = require("../models/users.js");
 const Payments = require("../models/payments.js");
 const { deleteImage } = require("./oceanServices.js");
-const {
-  appendDishToLunchSet,
-  removeDishFromLunchSet,
-} = require("./dataPrepServices.js");
 const { newError } = require("./services.js");
 const mongoose = require("mongoose");
 const axios = require("axios");
@@ -229,6 +225,42 @@ async function changeLunchMenuSet(restaurantId, action, lunchSet) {
   }
 }
 
+function appendDishToLunchSet(lunchMenu, setName, dishId, quantity) {
+  const result = lunchMenu.map((lunchSet) => {
+    if (lunchSet.lunchSetName === setName) {
+      let updatedSet = lunchSet;
+      let dishToAdd = {
+        dishId: dishId,
+        quantity: quantity
+      }
+      updatedSet.lunchSetDishes.push(dishToAdd);
+      return updatedSet;
+    } else {
+      return lunchSet;
+    }
+  });
+  return result;
+}
+
+function removeDishFromLunchSet(lunchMenu, setName, dishId) {
+  console.log("remove called")
+  const result = lunchMenu.map((lunchSet) => {
+    if (lunchSet.lunchSetName === setName) {
+      let updatedSet = lunchSet;
+      const index = updatedSet.lunchSetDishes.findIndex((dish) => {
+        return dish.dishId.toString() === dishId.toString();
+      });
+      if (index > -1) {
+        updatedSet.lunchSetDishes.splice(index, 1);
+      }
+      return updatedSet;
+    } else {
+      return lunchSet;
+    }
+  });
+  return result;
+}
+
 async function changeLunchMenu(restaurantId, setName, dishId, quantity, action) {
   if (action === "add") {
     const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
@@ -269,16 +301,11 @@ async function fetchRestaurant(id) {
   const data = await Restaurant.findById(id).catch((e) => {
     throw newError("Nie udało się pobrać restauracji.", 500);
   });
-  console.log("fetched restaurant");
   return data;
 }
 
 async function fetchMultipleRestaurants(idArray) {
-  let data = [];
-  for (const id of idArray) {
-    let response = await fetchRestaurant(id);
-    data.push(response);
-  }
+  let data = await Restaurant.find().where('_id').in(idArray).exec();
   return data;
 }
 

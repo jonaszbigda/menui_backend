@@ -40,7 +40,7 @@ function decodeAndSanitize(query) {
 
 async function checkPassword(password, hash) {
   const result = await bcrypt.compare(password, hash);
-  if (!result) throw newError("Hasło nieprawidłowe", 401);
+  if (!result) throw newError("Hasło nieprawidłowe", 403);
 }
 
 function generateAuthToken(user) {

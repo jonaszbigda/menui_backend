@@ -8,18 +8,30 @@ const { deleteImage } = require("./oceanServices.js");
 
 async function createUser(request) {
   const password = await hashPass(request.body.password);
-  const user = new User({
-    _id: new mongoose.Types.ObjectId(),
-    email: request.body.email,
-    password: password,
-    firstname: request.body.firstname,
-    lastname: request.body.lastname,
-    billing: {
-      NIP: request.body.NIP,
-      adress: request.body.adress,
-      companyName: request.body.companyName,
-    },
-  });
+  let user;
+  if(request.body.isRestaurant === true){
+    user = new User({
+      _id: new mongoose.Types.ObjectId(),
+      email: request.body.email,
+      password: password,
+      firstname: request.body.firstname,
+      lastname: request.body.lastname,
+      isRestaurant: true,
+      billing: {
+        NIP: request.body.NIP,
+        adress: request.body.adress,
+        companyName: request.body.companyName,
+      },
+    });
+  } else {
+    user = new User({
+      _id: new mongoose.Types.ObjectId(),
+      email: request.body.email,
+      login: request.body.login,
+      password: password,
+      isRestaurant: false,
+    });
+  }
   return user;
 }
 
@@ -113,6 +125,8 @@ async function prepareSafeUser(user) {
     firstname: user.firstname,
     lastname: user.lastname,
     email: user.email,
+    login: user.login,
+    isRestaurant: user.isRestaurant,
     id: user._id,
     restaurants: restaurants,
     NIP: user.billing.NIP,

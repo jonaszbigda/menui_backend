@@ -36,7 +36,10 @@ const userSchema = mongoose.Schema({
       maxlength: 64,
     },
   },
-  isRestaurant: Boolean,
+  isRestaurant: {
+    type: Boolean,
+    required: true
+  },
   restaurants: [mongoose.Types.ObjectId],
   trialUsed: Boolean,
   preferences: {

@@ -5,7 +5,7 @@ const validateLogin = function(requestBody){
     const email = validator.isEmail(requestBody.email) && validator.isLength(requestBody.email, { max: 64 })
     const password = validator.isLength(requestBody.password, { max: 64 });
     if(!email || !password){
-        throw newError("Dane logowania nieprawidłowe :/", 400);
+        throw newError("Dane logowania nieprawidłowe :/", 403);
     }
 }
 

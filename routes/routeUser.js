@@ -28,7 +28,7 @@ var router = express.Router();
 router.post("/login", async (req, res) => {
   try {
     if (!req.body.password || !req.body.email) {
-      throw newError("Niepełne dane.", 204);
+      throw newError("Niepełne dane.", 403);
     }
     validateLogin(req.body);
     const user = await fetchUser(req.body.email);
@@ -86,6 +86,15 @@ router.post("/register", async (req, res) => {
     handleError(e, res);
   }
 });
+
+// CHANGE USER DATA
+router.post("/edit", async (req, res) => {
+  try {
+    console.log("23")
+  } catch (error) {
+    handleError(error, res)
+  }
+})
 
 // CHANGE PASSWORD
 router.post("/changepass", async (req, res) => {

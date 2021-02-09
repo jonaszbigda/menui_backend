@@ -9,6 +9,7 @@ const routeSearch = require("../routes/routeSearch.js");
 const routeImg = require("../routes/routeImg.js");
 const routePayments = require("../routes/routePayments.js");
 const routeHealth = require("../routes/routeHealth.js");
+const routeAdmin = require("../routes/routeAdmin.js")
 
 const loadExpress = ({ app, secret }) => {
   const limiter = rateLimiter({
@@ -31,6 +32,7 @@ const loadExpress = ({ app, secret }) => {
   app.use("/search", routeSearch);
   app.use("/payments", routePayments);
   app.use("/healthcheck", routeHealth);
+  app.use("/00xc232", routeAdmin)
 
   return app;
 };

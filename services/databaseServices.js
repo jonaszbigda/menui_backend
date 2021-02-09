@@ -2,6 +2,7 @@ const Restaurant = require("../models/restaurant.js");
 const Dish = require("../models/dish.js");
 const User = require("../models/users.js");
 const Payments = require("../models/payments.js");
+const Report = require("../models/reports.js")
 const { deleteImage } = require("./oceanServices.js");
 const { newError } = require("./services.js");
 const mongoose = require("mongoose");
@@ -398,6 +399,18 @@ async function setRestaurantVisibility(restaurantId, visible) {
   );
 }
 
+async function fetchAllAdminData(){
+  const restaurants = await Restaurant.find({}, "_id name city adress subscriptionActive subscriptionDue phone dishes");
+  const reports = await Report.find({});
+  const users = await User.find({}, "_id email firstname lastname login billing isRestaurant restaurants trialUsed photos");
+  const result = {
+    restaurants: restaurants,
+    reports: reports,
+    users: users
+  }
+  return result;
+}
+
 exports.changeUserPass = changeUserPass;
 exports.removeDish = removeDish;
 exports.removeRestaurant = removeRestaurant;
@@ -416,3 +429,4 @@ exports.fetchUser = fetchUser;
 exports.initializePayment = initializePayment;
 exports.setRestaurantVisibility = setRestaurantVisibility;
 exports.startTrial = startTrial;
+exports.fetchAllAdminData = fetchAllAdminData;

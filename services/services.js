@@ -6,7 +6,8 @@ const sanitizer = require("string-sanitizer");
 const { renameBlob } = require("./oceanServices.js");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { jwtSecret } = require("../config/index.js");
+const crypto = require("crypto")
+const { jwtSecret, publicKey } = require("../config/index.js");
 
 function newError(message, status) {
   const error = {
@@ -23,6 +24,17 @@ function handleError(error, responseObject) {
   } else {
     responseObject.status(error.status).send(error.message);
   }
+}
+
+function encryptRSA(data) {
+  const encrypted = crypto.publicEncrypt({
+    key: publicKey,
+    padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+    oaepHash: "sha256"
+  },
+    Buffer.from(JSON.stringify(data))
+  )
+  return encrypted;
 }
 
 async function validateRestaurant(id) {
@@ -193,3 +205,4 @@ exports.hashPass = hashPass;
 exports.saveImage = saveImage;
 exports.generateRefreshToken = generateRefreshToken;
 exports.validateRefreshToken = validateRefreshToken;
+exports.encryptRSA = encryptRSA

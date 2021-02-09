@@ -10,4 +10,4 @@ const reportSchema = mongoose.Schema({
   invoicesSent: Number
 });
 
-module.exorts = mongoose.model("Report", reportSchema);
+module.exports = mongoose.model("Report", reportSchema);

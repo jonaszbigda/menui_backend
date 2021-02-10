@@ -13,4 +13,3 @@ exports.MAIL_PASS = process.env.MAIL_PASS;
 exports.s3_key = process.env.S3_KEY;
 exports.s3_secret = process.env.S3_SECRET;
 exports.appkey = process.env.APP_KEY
-exports.publicKey = process.env.PUBLIC_KEY

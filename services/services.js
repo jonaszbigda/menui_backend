@@ -26,17 +26,6 @@ function handleError(error, responseObject) {
   }
 }
 
-function encryptRSA(data) {
-  const encrypted = crypto.publicEncrypt({
-    key: publicKey,
-    padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-    oaepHash: "sha256"
-  },
-    Buffer.from(JSON.stringify(data))
-  )
-  return encrypted;
-}
-
 async function validateRestaurant(id) {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw newError("Nieprawidłowy ID", 204);
@@ -205,4 +194,3 @@ exports.hashPass = hashPass;
 exports.saveImage = saveImage;
 exports.generateRefreshToken = generateRefreshToken;
 exports.validateRefreshToken = validateRefreshToken;
-exports.encryptRSA = encryptRSA

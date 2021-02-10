@@ -3,12 +3,6 @@ const { port, dbPass, cookiesSecret } = config;
 const express = require("express");
 const app = express();
 const loaders = require("./loaders/index.js");
-
-/* const crypto = require("crypto")
-crypto.generateKeyPair("rsa", { modulusLength: 2048 }, (err, publicKey, privateKey) => {
-  console.log(publicKey.export({ format: "pem", type: "pkcs1" }))
-  console.log(privateKey.export({ format: "pem", type: "pkcs1" }))
-}) */
 //
 // Server init function
 //

@@ -1,23 +1,23 @@
 const express = require("express");
+const jwt = require('jsonwebtoken')
 const { appkey } = require("../config")
 const { fetchAllAdminData } = require("../services/databaseServices.js");
 const {
     newError,
-    handleError,
-    encryptRSA
+    handleError
   } = require("../services/services.js");
 
 var router = express.Router();
 
 router.post("/getall", async (req, res) => {
     try {
-        if(req.body.key === appkey){
-            const results = await fetchAllAdminData();
-            const encrypted = encryptRSA(results)
-            res.send(encrypted) 
-        } else {
+        const verified = jwt.verify(req.body.token, appkey, {ignoreExpiration: false})
+        if(!verified){
             throw newError("Brak dostępu", 403)
         }
+        const results = await fetchAllAdminData();
+        const encrypted = jwt.sign(results, appkey, {expiresIn: "30m"})
+        res.send(encrypted) 
     } catch (error) {
         handleError(error, res)
     }

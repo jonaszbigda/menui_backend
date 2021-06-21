@@ -14,13 +14,11 @@ router.get("/", async (req, res) => {
       const query = sanitizer.sanitize.keepUnicode(decodeURI(req.query.string));
       validateSearch(query);
       const regex = new RegExp(query, "i");
-
       Restaurant.find(
         {
           $and: [
             { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
-            { $or: [{ hidden: false }, { hidden: { $exists: false } }] },
-            { subscriptionActive: true },
+            { $or: [{ hidden: false }, { hidden: { $exists: false } }] }
           ],
         },
         "_id name city adress type imgUrl workingHours description tags location"
@@ -76,8 +74,7 @@ router.get("/autocomplete/", (req, res) => {
     Restaurant.find(
       { $and: [
         { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
-        { $or: [{ hidden: false }, { hidden: { $exists: false } }] },
-        { subscriptionActive: true },
+        { $or: [{ hidden: false }, { hidden: { $exists: false } }] }
       ], },
       "name city",
       (err, doc) => {

@@ -81,6 +81,7 @@ async function createRestaurant(request, oldRestaurant) {
         links: request.links,
         phone: request.phone,
         hidden: request.hidden,
+        indexed: new Date()
       });
       return restaurant;
     } else {
@@ -107,9 +108,8 @@ async function createRestaurant(request, oldRestaurant) {
         links: request.links,
         phone: request.phone,
         hidden: request.hidden,
-        subscriptionActive: oldRestaurant.subscriptionActive,
-        subscriptionDue: oldRestaurant.subscriptionDue,
-        subscriptionStarted: oldRestaurant.subscriptionStarted,
+        indexed: request.indexed,
+        ratings: request.ratings
       });
       return restaurant;
     }

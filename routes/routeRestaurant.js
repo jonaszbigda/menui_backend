@@ -9,9 +9,7 @@ const {
   changeLunchMenu,
   changeLunchMenuSet,
   fetchUser,
-  renewSubscription,
   setRestaurantVisibility,
-  startTrial
 } = require("../services/databaseServices.js");
 const {
   decodeAndSanitize,
@@ -184,36 +182,5 @@ router.post("/visibility", async (req, res) => {
   }
 })
 
-// ACTIVATE SUBSCRIPTION
-
-router.post("/subscription", async (req, res) => {
-  try {
-    const token = req.headers["x-auth-token"];
-    const user = validateUserToken(token);
-    await validateRestaurant(req.body.restaurantId);
-    /* const response = await initializePayment(
-      req.body.restaurantId,
-      req.body.userData,
-      req.body.type
-    ); */
-    await renewSubscription(req.body.restaurantId, req.body.type);
-    res.sendStatus(200);
-  } catch (error) {
-    handleError(error, res);
-  }
-});
-
-// ACTIVATE TRIAL
-
-router.post("/trial", async (req, res) => {
-  try {
-    const token = req.headers["x-auth-token"];
-    const user = validateUserToken(token);
-    await startTrial(req.body.restaurantId, user);
-    res.send("Okres próbny aktywowany.");
-  } catch (error) {
-    handleError(error, res);
-  }
-})
 
 module.exports = router;

@@ -1,13 +1,9 @@
 const Restaurant = require("../models/restaurant.js");
 const Dish = require("../models/dish.js");
 const User = require("../models/users.js");
-const Payments = require("../models/payments.js");
 const Report = require("../models/reports.js")
 const { deleteImage } = require("./oceanServices.js");
 const { newError } = require("./services.js");
-const mongoose = require("mongoose");
-const axios = require("axios");
-const crypto = require("crypto");
 
 async function changeUserPass(userId, newPass) {
   User.findByIdAndUpdate(userId, { $set: { password: newPass } }).catch((e) => {
@@ -65,84 +61,6 @@ async function addRestaurantToUser(user, restaurant) {
   }).catch((e) => {
     throw newError("Nie udało się dodać restauracji do użytkownika", 500);
   });
-}
-
-function dueDateBasedOnSubscription(restaurant, monthsToAdd) {
-  let date;
-  if (
-    restaurant.subscriptionActive === false ||
-    !restaurant.subscriptionActive
-  ) {
-    date = new Date();
-    date.setMonth(date.getMonth() + monthsToAdd);
-    return date;
-  } else {
-    date = restaurant.subscriptionDue;
-    date.setMonth(date.getMonth() + monthsToAdd);
-    return date;
-  }
-}
-
-function startDate(restaurant) {
-  let date;
-  if (
-    restaurant.subscriptionActive === true &&
-    restaurant.subscriptionStarted
-  ) {
-    date = restaurant.subscriptionStarted;
-    return date;
-  } else {
-    date = new Date();
-    return date;
-  }
-}
-
-async function renewSubscription(restaurantId, monthsToAdd) {
-  const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
-    throw newError("Nie udało się pobrać restauracji.", 404);
-  });
-  const dueDate = dueDateBasedOnSubscription(restaurant, monthsToAdd);
-  const start = startDate(restaurant);
-  await Restaurant.findByIdAndUpdate(restaurantId, {
-    $set: {
-      subscriptionActive: true,
-      subscriptionDue: dueDate,
-      subscriptionStarted: start,
-    },
-  }).catch((e) => {
-    throw newError(
-      "Nie udało się przedłużyć subskrypcji, spróbuj ponownie.",
-      500
-    );
-  });
-  return dueDateBasedOnSubscription(restaurant, monthsToAdd);
-}
-
-async function startTrial(restaurantId, userData) {
-  const restaurant = await Restaurant.findById(restaurantId).catch((err) => {
-    throw newError("Nie udało się pobrać restauracji.", 404);
-  });
-  if (!userData.trialUsed || userData.trialUsed === false) {
-    const dueDate = dueDateBasedOnSubscription(restaurant, 3);
-    const start = startDate(restaurant);
-    await Restaurant.findByIdAndUpdate(restaurantId, {
-    $set: {
-      subscriptionActive: true,
-      subscriptionDue: dueDate,
-      subscriptionStarted: start,
-    },
-    }).catch((e) => {
-    throw newError(
-      "Nie udało się aktywować okresu próbnego.",
-      500
-    );
-    });
-    await User.findByIdAndUpdate(userData.id, { $set: { trialUsed: true } }).catch((e) => {
-      throw newError("Błąd podczas aktywacji okresu próbnego (user data)")
-    })
-  } else {
-    throw newError("Okres próbny został już wykorzystany.", 500);
-  }
 }
 
 async function checkIfCategoryExists(restaurant, category) {
@@ -330,67 +248,6 @@ async function fetchUser(email) {
   return user;
 }
 
-function amountFromType(type) {
-  if (type === 1) {
-    return 6150;
-  } else if (type === 12) {
-    return 61500;
-  } else {
-    return 0;
-  }
-}
-
-function controlSum(sessionId, merchantId, amount, currency) {
-  const input = {
-    sessionId: sessionId,
-    merchantId: merchantId,
-    amount: amount,
-    currency: currency,
-    crc: "???? wie co tu ma być",
-  };
-  let hash = crypto.createHash("sha384");
-  const checkSum = hash.update(input, "utf8");
-  return checkSum;
-}
-
-async function registerTransaction(paymentInfo, userData) {
-  const data = {
-    merchantId: 11111,
-    posId: paymentInfo.type,
-    sessionId: paymentInfo._id,
-    amount: paymentInfo.amount,
-    currency: "PLN",
-    description: `Subskrypcja Menui na: ${paymentInfo.months} miesięcy.`,
-    email: userData.userEmail,
-    client: `${userData.firstname} ${userData.lastname}`,
-    country: "PL",
-    language: "pl",
-    urlReturn: "http://test.pl",
-    sign: controlSum(paymentInfo._id, 11111, paymentInfo.amount, "PLN"),
-  };
-  const response = await axios({
-    method: "POST",
-    url: "https://sandbox.przelewy24.pl/api/v1",
-    data: data,
-  }).catch((error) => {
-    console.log(error);
-    throw newError("Błąd.", 500);
-  });
-  return response;
-}
-
-async function initializePayment(restaurantId, userData, type) {
-  const newPayment = new Payments({
-    _id: new mongoose.Types.ObjectId(),
-    restaurantId: restaurantId,
-    amount: amountFromType(type),
-    months: type,
-  });
-  const payment = await registerTransaction(newPayment, userData);
-  newPayment.save();
-  return payment;
-}
-
 async function setRestaurantVisibility(restaurantId, visible) {
   await Restaurant.findByIdAndUpdate(restaurantId, { $set: { hidden: !visible } }).catch(
     (e) => {
@@ -416,7 +273,6 @@ exports.removeDish = removeDish;
 exports.removeRestaurant = removeRestaurant;
 exports.addDishToRestaurant = addDishToRestaurant;
 exports.addRestaurantToUser = addRestaurantToUser;
-exports.renewSubscription = renewSubscription;
 exports.changeCategory = changeCategory;
 exports.setDishVisibility = setDishVisibility;
 exports.changeLunchMenuSet = changeLunchMenuSet;
@@ -426,7 +282,5 @@ exports.fetchMultipleRestaurants = fetchMultipleRestaurants;
 exports.fetchAllDishesForRestaurant = fetchAllDishesForRestaurant;
 exports.fetchDish = fetchDish;
 exports.fetchUser = fetchUser;
-exports.initializePayment = initializePayment;
 exports.setRestaurantVisibility = setRestaurantVisibility;
-exports.startTrial = startTrial;
 exports.fetchAllAdminData = fetchAllAdminData;

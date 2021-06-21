@@ -104,9 +104,6 @@ const restaurantSchema = mongoose.Schema({
     maxlength: 24
   },
   hidden: Boolean,
-  subscriptionActive: Boolean,
-  subscriptionStarted: Date,
-  subscriptionDue: Date,
   indexed: Date,
   categories: [String],
   lunchHours: {

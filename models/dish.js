@@ -22,8 +22,8 @@ const dishSchema = mongoose.Schema({
       price: {
         type: String,
         maxlength: 20,
-        required: true
-      }
+        required: true,
+      },
     },
     price2: {
       priceName: {
@@ -33,7 +33,7 @@ const dishSchema = mongoose.Schema({
       price: {
         type: String,
         maxlength: 20,
-      }
+      },
     },
     price3: {
       priceName: {
@@ -43,8 +43,8 @@ const dishSchema = mongoose.Schema({
       price: {
         type: String,
         maxlength: 20,
-      }
-    }
+      },
+    },
   },
   notes: {
     type: String,
@@ -70,14 +70,6 @@ const dishSchema = mongoose.Schema({
   kCal: String,
   vegan: Boolean,
   vegetarian: Boolean,
-  photos: [mongoose.Types.ObjectId],
-  ratings: [
-    {
-      id: mongoose.Types.ObjectId,
-      rate: Number,
-      owner: mongoose.Types.ObjectId
-    }
-  ]
 });
 
 module.exports = mongoose.model("Dish", dishSchema);

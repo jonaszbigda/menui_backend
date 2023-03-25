@@ -9,7 +9,7 @@ const { deleteImage } = require("./oceanServices.js");
 async function createUser(request) {
   const password = await hashPass(request.body.password);
   let user;
-  if(request.body.isRestaurant === true){
+  if (request.body.isRestaurant === true) {
     user = new User({
       _id: new mongoose.Types.ObjectId(),
       email: request.body.email,
@@ -81,7 +81,7 @@ async function createRestaurant(request, oldRestaurant) {
         links: request.links,
         phone: request.phone,
         hidden: request.hidden,
-        indexed: new Date()
+        indexed: new Date(),
       });
       return restaurant;
     } else {
@@ -109,7 +109,7 @@ async function createRestaurant(request, oldRestaurant) {
         phone: request.phone,
         hidden: request.hidden,
         indexed: request.indexed,
-        ratings: request.ratings
+        ratings: request.ratings,
       });
       return restaurant;
     }
@@ -182,43 +182,7 @@ async function createDish(dish, restaurantId, oldDish) {
   }
 }
 
-function appendDishToLunchSet(lunchMenu, setName, dishId, quantity) {
-  console.log("append called")
-  const result = lunchMenu.map((lunchSet) => {
-    if (lunchSet.lunchSetName === setName) {
-      let updatedSet = lunchSet;
-      let dishToAdd = {
-        dishId: dishId,
-        quantity: quantity
-      }
-      updatedSet.lunchSetDishes.push(dishToAdd);
-      return updatedSet;
-    } else {
-      return lunchSet;
-    }
-  });
-  return result;
-}
-
-function removeDishFromLunchSet(lunchMenu, setName, dishId) {
-  const result = lunchMenu.map((lunchSet) => {
-    if (lunchSet.lunchSetName === setName) {
-      let updatedSet = lunchSet;
-      const index = updatedSet.lunchSetDishes.findIndex(dish => dish.dishId === dishId);
-      if (index > -1) {
-        updatedSet.lunchSetDishes.splice(index, 1);
-      }
-      return updatedSet;
-    } else {
-      return lunchSet;
-    }
-  });
-  return result;
-}
-
 exports.createUser = createUser;
 exports.createRestaurant = createRestaurant;
 exports.prepareSafeUser = prepareSafeUser;
 exports.createDish = createDish;
-exports.appendDishToLunchSet = appendDishToLunchSet;
-exports.removeDishFromLunchSet = removeDishFromLunchSet;

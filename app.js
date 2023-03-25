@@ -9,8 +9,6 @@ const loaders = require("./loaders/index.js");
 async function startServer() {
   await loaders({
     expressApp: app,
-    dbPass: dbPass,
-    secret: cookiesSecret,
   });
   app.listen(port, (err) => {
     if (err) {

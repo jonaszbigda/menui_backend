@@ -104,6 +104,8 @@ const restaurantSchema = mongoose.Schema({
     maxlength: 24,
   },
   hidden: Boolean,
+  subscriptionActive: Boolean,
+  subscriptionDue: Date,
   indexed: Date,
   categories: [String],
   dishes: [mongoose.Types.ObjectId],

@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
-const {
-  dbPass,
-  dbName,
-} = require("../config/index.js");
+const { dbPass, dbName } = require("../config/index.js");
 
 const loadMongoose = async () => {
   const connection = await mongoose.connect(
@@ -10,11 +7,14 @@ const loadMongoose = async () => {
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     },
     (err) => {
-      if (err) console.log("Unable to connect :(");
-      else console.log("Connected To Database");
+      if (err) {
+        console.log("Unable to connect :(");
+      } else {
+        console.log("DB Connected");
+      }
     }
   );
 };

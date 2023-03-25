@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
         {
           $and: [
             { $or: [{ city: { $regex: regex } }, { name: { $regex: regex } }] },
-            { $or: [{ hidden: false }, { hidden: { $exists: false } }] }
+            { $or: [{ hidden: false }, { hidden: { $exists: false } }] },
           ],
         },
         "_id name city adress type imgUrl workingHours description tags location"
@@ -62,6 +62,7 @@ router.get("/location", async (req, res) => {
 });
 
 // AUTOCOMPLETE
+/*
 
 router.get("/autocomplete/", (req, res) => {
   if (req.query.string.length > 0) {
@@ -103,5 +104,7 @@ router.get("/autocomplete/", (req, res) => {
     });
   }
 });
+
+*/
 
 module.exports = router;

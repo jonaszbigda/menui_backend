@@ -1,11 +1,7 @@
 const nodemailer = require("nodemailer");
 const path = require("path");
 const { MAIL_PASS } = require("../config/index.js");
-const makeResetPassMessage = require("../config/mailTemplateReset.js");
-const {
-  newError,
-  generatePasswordResetLink,
-} = require("../services/services.js");
+const { newError } = require("../services/services.js");
 
 const images = path.resolve("images");
 
@@ -35,18 +31,3 @@ async function sendMail(reciever, subject, textMessage, htmlMessage) {
     ],
   });
 }
-
-async function resetPassword(email) {
-  const resetLink = generatePasswordResetLink(email);
-  const message = makeResetPassMessage(resetLink);
-  await sendMail(
-    email,
-    "Menui - Resetowanie hasła",
-    message.text,
-    message.html
-  ).catch((err) => {
-    throw newError("Nieznany błąd podczas resetu hasła", 500);
-  });
-}
-
-exports.resetPassword = resetPassword;
